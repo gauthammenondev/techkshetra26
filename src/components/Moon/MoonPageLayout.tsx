@@ -1,7 +1,9 @@
 import type React from 'react'
-import { useEffect, useLayoutEffect, useRef } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState, useCallback } from 'react'
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion.ts'
 import { useRafScroll } from '../../hooks/useRafScroll.ts'
+import { useTitleAnimation } from '../../hooks/useTitleAnimation.ts'
+import { PageTitle } from '../Title/PageTitle.tsx'
 import {
   DEFAULT_MOON_CONFIG,
   computeGeometry,
@@ -11,16 +13,15 @@ import {
   globalMoonRef,
   type MoonConfig,
   type MoonGeometry,
+  type RotationDirection,
 } from './moon.types.ts'
 import styles from './MoonPageLayout.module.css'
 
 // Global state for continuous animation across page mounts.
-// By persisting these values, the Moon inherits its exact position, opacity, 
-// and rotation from the previous page, allowing for completely seamless 
-// transitions during route changes without unmounting or snapping.
 let globalRenderedY: number | null = null
 let globalRenderedOpacity: number | null = null
 let globalRenderedAngle: number | null = null
+let globalPreviousTitle: React.ReactNode = null
 
 type MoonPageLayoutProps = {
   readonly title: React.ReactNode
@@ -35,9 +36,7 @@ type MoonPageLayoutProps = {
  * - Renders three scroll sections (z-index 1).
  * - Computes scroll progress → eased sub-progress → Moon translateY and opacity each frame.
  * - Lerps Moon rotation smoothly to the target rotation prop on route change.
- * - Recalculates geometry on viewport resize via ResizeObserver.
- * - All transform and opacity writes use direct DOM ref updates inside rAF on the globally persisted MoonBackground layer.
- * - Respects prefers-reduced-motion: skips lerp damping, uses direct mapping.
+ * - Animates the outgoing and incoming title using physics-based inertia.
  */
 export function MoonPageLayout({
   title,
@@ -52,8 +51,33 @@ export function MoonPageLayout({
   const geometryRef = useRef<MoonGeometry | null>(null)
   const reducedMotion = usePrefersReducedMotion()
 
-  // Behavior: Smooth scrolling to top is handled globally by App.tsx <ScrollToTop />,
-  // but we keep this layout effect as a fallback for structural positioning.
+  // Determine title fly direction based on rotation delta on mount
+  const [direction] = useState<RotationDirection>(() => {
+    const initialAngleDelta = rotation - (globalRenderedAngle ?? rotation)
+    if (initialAngleDelta > 0.01) return 'clockwise'
+    if (initialAngleDelta < -0.01) return 'counter-clockwise'
+    return 'none'
+  })
+
+  // Title animation state
+  const [outgoingTitle, setOutgoingTitle] = useState<React.ReactNode>(globalPreviousTitle)
+
+  useEffect(() => {
+    return () => {
+      globalPreviousTitle = title
+    }
+  }, [title])
+
+  const handleOutgoingSettled = useCallback(() => {
+    setOutgoingTitle(null)
+  }, [])
+
+  const { incomingRef, outgoingRef } = useTitleAnimation(
+    outgoingTitle !== null,
+    direction,
+    handleOutgoingSettled
+  )
+
   useLayoutEffect(() => {
   }, [])
 
@@ -78,7 +102,6 @@ export function MoonPageLayout({
       const geo = computeGeometry(effectConfig, vw, vh, totalHeight)
       geometryRef.current = geo
 
-      // Size the Moon wrapper via direct DOM write (only recalculated on resize)
       const moon = globalMoonRef.current
       if (moon) {
         moon.style.width = `${geo.moonSizePx}px`
@@ -107,26 +130,21 @@ export function MoonPageLayout({
     const moon = globalMoonRef.current
     if (!geo || !moon) return
 
-    // Compute raw sub-progresses for each transition phase
     const rawP1 = clamp(scrollY / Math.max(geo.phase1End, 1), 0, 1)
     const phase2Range = geo.maxScroll - geo.phase2Start
     const rawP2 = phase2Range > 0
       ? clamp((scrollY - geo.phase2Start) / phase2Range, 0, 1)
       : 0
 
-    // Apply easing to each sub-progress independently
     const easedP1 = easeInOutCubic(rawP1)
     const easedP2 = easeInOutCubic(rawP2)
 
-    // Interpolate Moon Y through keyframes: A → B → C
     const phase1Y = lerp(geo.targetA.translateY, geo.targetB.translateY, easedP1)
     const targetY = lerp(phase1Y, geo.targetC.translateY, easedP2)
 
-    // Interpolate Moon opacity through keyframes: A → B → C
     const phase1Opacity = lerp(geo.targetA.opacity, geo.targetB.opacity, easedP1)
     const targetOpacity = lerp(phase1Opacity, geo.targetC.opacity, easedP2)
 
-    // Apply hybrid smoothing (lerp damping) or direct mapping
     let finalY: number
     let finalOpacity: number
     let finalAngle: number
@@ -139,7 +157,6 @@ export function MoonPageLayout({
       finalY =
         globalRenderedY +
         (targetY - globalRenderedY) * lerpDamping
-      // Snap when close enough to prevent sub-pixel drift
       if (Math.abs(finalY - targetY) < 0.5) {
         finalY = targetY
       }
@@ -147,7 +164,6 @@ export function MoonPageLayout({
       finalOpacity =
         globalRenderedOpacity +
         (targetOpacity - globalRenderedOpacity) * lerpDamping
-      // Snap when close enough to prevent precision drift
       if (Math.abs(finalOpacity - targetOpacity) < 0.001) {
         finalOpacity = targetOpacity
       }
@@ -155,7 +171,6 @@ export function MoonPageLayout({
       finalAngle =
         globalRenderedAngle +
         (rotation - globalRenderedAngle) * rotationDamping
-      // Snap when close enough to prevent infinite micro-updates
       if (Math.abs(rotation - finalAngle) < rotationSettleThreshold) {
         finalAngle = rotation
       }
@@ -165,7 +180,6 @@ export function MoonPageLayout({
     globalRenderedOpacity = finalOpacity
     globalRenderedAngle = finalAngle
     
-    // Single unified DOM write per frame
     moon.style.transform = `translate3d(-50%, ${finalY}px, 0) scale(1) rotate(${finalAngle}deg)`
     moon.style.opacity = finalOpacity.toString()
   })
@@ -176,7 +190,14 @@ export function MoonPageLayout({
         className={styles.titleSection}
         style={{ height: `${mergedConfig.titleHeightVh}vh` }}
       >
-        {title}
+        {outgoingTitle && (
+          <PageTitle ref={outgoingRef} isOutgoing>
+            {outgoingTitle}
+          </PageTitle>
+        )}
+        <PageTitle ref={incomingRef}>
+          {title}
+        </PageTitle>
       </section>
       <main
         className={styles.contentSection}

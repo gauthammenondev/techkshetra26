@@ -34,6 +34,16 @@ export type MoonConfig = {
   readonly footerHeightVh: number
 }
 
+export type TitleAnimConfig = {
+  readonly flyDamping: number        // lerp factor for x position
+  readonly bendSensitivity: number   // skew multiplier from velocity
+  readonly bendDecayFactor: number   // lerp factor for bend return
+  readonly opacityDamping: number    // lerp factor for opacity
+  readonly settleThreshold: number   // px delta to consider settled
+}
+
+export type RotationDirection = 'clockwise' | 'counter-clockwise' | 'none'
+
 /** Computed geometry for Moon positioning, recalculated on resize. */
 export type MoonGeometry = {
   /** keyframe state when Moon's top-horizon tip aligns with 50vh. */
@@ -66,6 +76,14 @@ export const DEFAULT_MOON_CONFIG: MoonConfig = {
   titleHeightVh: 100,
   contentHeightVh: 300,
   footerHeightVh: 100,
+} as const
+
+export const TITLE_ANIM_CONFIG: TitleAnimConfig = {
+  flyDamping: 0.08,
+  bendSensitivity: 0.20,
+  bendDecayFactor: 0.12,
+  opacityDamping: 0.1,
+  settleThreshold: 0.5,
 } as const
 
 import React from 'react'
