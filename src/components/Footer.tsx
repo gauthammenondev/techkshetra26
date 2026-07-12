@@ -12,7 +12,7 @@ export function Footer(): React.JSX.Element {
   const sendEmail = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setStatusMessage('Sending...')
-    
+
     // Placeholder logic for demonstration
     console.log('Form submitted. Uncomment emailjs logic to send emails.')
     setStatusMessage('Feedback sent successfully!')
@@ -34,18 +34,18 @@ export function Footer(): React.JSX.Element {
                 <span className={styles.yearText}>&apos;26</span>
               </div>
             </div>
-            
+
             <div className={styles.subLogos}>
               <img src={jubileeLogo} alt="Jubilee Logo" className={styles.subLogo} />
               <img src={rsetLogo} alt="RSET Logo" className={styles.subLogo} />
             </div>
           </div>
-          
+
           <p className={styles.addressText}>
             Rajagiri School of Engineering &amp; Technology<br />
             Kochi, Kerala 682039
           </p>
-          
+
           <div className={styles.mapWrapper}>
             <iframe
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3928.590214224168!2d76.32759901524383!3d10.05286029281742!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b080c30932828b1%3A0x454817a3ec45b44!2sRajagiri%20School%20of%20Engineering%20%26%20Technology!5e0!3m2!1sen!2sin!4v1672661555181!5m2!1sen!2sin"
@@ -84,7 +84,7 @@ export function Footer(): React.JSX.Element {
               />
               <div className={styles.inputGlow}></div>
             </div>
-            
+
             <div className={styles.inputGroup}>
               <input
                 type="email"
@@ -95,7 +95,7 @@ export function Footer(): React.JSX.Element {
               />
               <div className={styles.inputGlow}></div>
             </div>
-            
+
             <div className={styles.inputGroup}>
               <textarea
                 name="message"
@@ -118,7 +118,7 @@ export function Footer(): React.JSX.Element {
 
       {/* Developer credits */}
       <div className={styles.footerBottom}>
-        <p className={styles.creditsText}>Developed with ❤️ by Techkshetra Team</p>
+        <p className={styles.creditsText}>Developed with ❤️ by the Techkshetra website team</p>
         <p className={styles.copyrightText}>© 2026 Techkshetra, All Rights Reserved</p>
       </div>
     </footer>
