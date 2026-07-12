@@ -15,12 +15,20 @@ type SunStoreState = {
   readonly targetRotation: number
   readonly isTransitioning: boolean
   readonly rotationComplete: boolean
+  readonly cssRotationAngle: number
+  readonly isAnimating: boolean
+  readonly startAngle: number
+  readonly targetAngle: number
+  readonly startTime: number
 }
 
 type SunStoreActions = {
   readonly setPage: (page: PageState) => void
   readonly completeRotation: () => void
   readonly completeTransition: () => void
+  readonly initializePage: (page: PageState, angle: number) => void
+  readonly startTransition: (page: PageState, angle: number) => void
+  readonly endTransition: () => void
 }
 
 type SunStore = SunStoreState & SunStoreActions
@@ -30,6 +38,11 @@ export const useSunStore = create<SunStore>((set, get) => ({
   targetRotation: PAGE_ROTATION_MAP.home,
   isTransitioning: false,
   rotationComplete: false,
+  cssRotationAngle: -90, // Maps to home page rotation
+  isAnimating: false,
+  startAngle: -90,
+  targetAngle: -90,
+  startTime: 0,
 
   setPage: (page: PageState) => {
     const current = get()
@@ -49,5 +62,38 @@ export const useSunStore = create<SunStore>((set, get) => ({
 
   completeTransition: () => {
     set({ isTransitioning: false, rotationComplete: false })
+  },
+
+  initializePage: (page: PageState, angle: number) => {
+    set({
+      activePage: page,
+      startAngle: angle,
+      targetAngle: angle,
+      cssRotationAngle: angle,
+      isAnimating: false,
+      startTime: 0,
+    })
+  },
+
+  startTransition: (page: PageState, angle: number) => {
+    const currentAngle = get().targetAngle
+    set({
+      activePage: page,
+      startAngle: currentAngle,
+      targetAngle: angle,
+      cssRotationAngle: angle,
+      isTransitioning: true,
+      isAnimating: true,
+      startTime: performance.now(),
+    })
+  },
+
+  endTransition: () => {
+    const current = get()
+    set({
+      isAnimating: false,
+      isTransitioning: false,
+      startAngle: current.targetAngle,
+    })
   },
 }))

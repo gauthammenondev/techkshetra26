@@ -1,10 +1,9 @@
 /* Curved title SVG overlay — positioned above the Sun canvas */
 .curvedTitleContainer {
   position: fixed;
-  bottom: 15vh; /* Sits above the Sun crown */
-  left: 0;
+  inset: 0;
   width: 100%;
-  height: 15vh;
+  height: 100%;
   z-index: 5;
   pointer-events: none;
   overflow: visible;
@@ -12,16 +11,29 @@
 
 .curvedTitleSvg {
   display: block;
+  width: 100%;
+  height: 100%;
   overflow: visible;
 }
 
 .titleText {
-  fill: var(--color-text-primary);
+  fill: #fff;
   font-family: var(--font-family-primary);
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-semibold);
-  letter-spacing: var(--letter-spacing-widest);
-  transition: opacity var(--transition-base);
+  font-size: clamp(2.2rem, 6vw, 4.5rem);
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-shadow: 0 0 40px rgba(255, 120, 30, 0.4);
+  text-transform: uppercase;
+}
+
+.subtitleText {
+  fill: rgba(255, 255, 255, 0.6);
+  font-family: var(--font-family-primary);
+  font-size: clamp(0.9rem, 2.5vw, 1.25rem);
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-shadow: 0 0 20px rgba(255, 120, 30, 0.25);
+  text-transform: uppercase;
 }
 
 .titleFadeIn {

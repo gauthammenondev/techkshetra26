@@ -20,12 +20,11 @@ import type { Mesh } from 'three'
 import { ShaderMaterial } from 'three'
 import vertexShader from '../../shaders/sunSurface.vert.glsl'
 import fragmentShader from '../../shaders/sunSurface.frag.glsl'
-import { useSunStore } from '../../store/sunStore.ts'
 import type { GPUTierLevel } from '../../types/sun.types.ts'
 
 const SPHERE_RADIUS = 8
 const SPHERE_SEGMENTS = 64
-const SPHERE_CENTER_Y = -4
+const SPHERE_CENTER_Y = 0
 
 /** [radius, widthSegments, heightSegments] */
 const SPHERE_ARGS: [number, number, number] = [
@@ -33,11 +32,6 @@ const SPHERE_ARGS: [number, number, number] = [
   SPHERE_SEGMENTS,
   SPHERE_SEGMENTS,
 ]
-
-/** Spring constants — give the Sun a sense of mass */
-const SPRING_STIFFNESS = 80
-const SPRING_DAMPING = 12
-const SPRING_MASS = 5
 
 function getNoiseOctaves(tier: GPUTierLevel): number {
   switch (tier) {
@@ -53,13 +47,8 @@ type SunSphereProps = {
 }
 
 export function SunSphere({ gpuTier, reducedMotion }: SunSphereProps): React.JSX.Element {
-  // Direct ref to the Three.js Mesh object — mutated in useFrame
   const meshRef = useRef<Mesh>(null)
   const materialRef = useRef<ShaderMaterial>(null)
-
-  // Spring physics state held in refs — no re-renders needed
-  const currentRotation = useRef(0)
-  const rotationVelocity = useRef(0)
 
   const noiseOctaves = getNoiseOctaves(gpuTier)
 
@@ -79,35 +68,9 @@ export function SunSphere({ gpuTier, reducedMotion }: SunSphereProps): React.JSX
       uniforms.current.uNoiseOctaves.value = noiseOctaves
     }
 
-    // — Rotation spring physics —
-    const targetRotation = useSunStore.getState().targetRotation
-
-    if (reducedMotion) {
-      currentRotation.current = targetRotation
-      rotationVelocity.current = 0
-    } else {
-      const displacement = currentRotation.current - targetRotation
-      const springForce = -SPRING_STIFFNESS * displacement
-      const dampingForce = -SPRING_DAMPING * rotationVelocity.current
-      const acceleration = (springForce + dampingForce) / SPRING_MASS
-
-      rotationVelocity.current += acceleration * delta
-      currentRotation.current += rotationVelocity.current * delta
-    }
-
-    // — CRITICAL: mutate the Three.js object directly —
-    mesh.rotation.y = currentRotation.current
-
-    // — Signal rotation completion —
-    const nearTarget = Math.abs(currentRotation.current - targetRotation) < 0.005
-    const settled = Math.abs(rotationVelocity.current) < 0.005
-    const state = useSunStore.getState()
-
-    if (nearTarget && settled && state.isTransitioning && !state.rotationComplete) {
-      currentRotation.current = targetRotation
-      rotationVelocity.current = 0
-      mesh.rotation.y = targetRotation
-      useSunStore.getState().completeRotation()
+    // — Slow continuous globe Y-rotation —
+    if (!reducedMotion) {
+      mesh.rotation.y += delta * 0.05
     }
   })
 

@@ -21,6 +21,14 @@ export const PAGE_TITLE_MAP: Readonly<Record<PageState, string>> = {
   contact: 'CONTACT US',
 } as const
 
+export const PAGE_SUBTITLE_MAP: Readonly<Record<PageState, string>> = {
+  home: 'Where Technology Meets Innovation',
+  events: 'Technical competitions and workshops',
+  gallery: 'Moments from Techkshetra',
+  about: 'Our story and mission',
+  contact: 'Get in touch with the team',
+} as const
+
 /** Maps each page state to its URL path */
 export const PAGE_PATH_MAP: Readonly<Record<PageState, string>> = {
   home: '/',
@@ -28,6 +36,22 @@ export const PAGE_PATH_MAP: Readonly<Record<PageState, string>> = {
   gallery: '/gallery',
   about: '/about',
   contact: '/contact',
+} as const
+
+export type SphereArcData = {
+  readonly cx: number
+  readonly cy: number
+  readonly radius: number
+  readonly startAngle: number
+  readonly endAngle: number
+}
+
+export const PAGE_ROTATION_DEGREES: Readonly<Record<PageState, number>> = {
+  home: -90,
+  events: 0,
+  gallery: 90,
+  about: 180,
+  contact: 270,
 } as const
 
 export type GPUTierLevel = 'high' | 'medium' | 'low'

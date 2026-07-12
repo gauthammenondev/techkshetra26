@@ -1,16 +1,3 @@
-/**
- * Behavior: 3D scene composition.
- *
- * Camera strategy — "zoomed crown" framing:
- *   The sphere has radius 8, centered at Y = -2.
- *   Its top sits at world Y = +6.
- *   Camera sits at Y = 4, Z = 6, looking at Y = 0.
- *   This frames the top ~40% of the sphere — a wide glowing crown
- *   that dominates the lower half of the viewport.
- *
- * Post-processing: bloom picks up HDR surface values.
- */
-
 import type React from 'react'
 import { PerspectiveCamera } from '@react-three/drei'
 import { EffectComposer, Bloom } from '@react-three/postprocessing'
@@ -50,8 +37,11 @@ export function SunScene({ gpuTier, reducedMotion }: SunSceneProps): React.JSX.E
         far={200}
       />
 
-      <SunSphere gpuTier={gpuTier} reducedMotion={reducedMotion} />
-      <SunFlares gpuTier={gpuTier} reducedMotion={reducedMotion} />
+      {/* Group centered at sphere center Y = -4 acting as pivot */}
+      <group position={[0, -4, 0]}>
+        <SunSphere gpuTier={gpuTier} reducedMotion={reducedMotion} />
+        <SunFlares gpuTier={gpuTier} reducedMotion={reducedMotion} />
+      </group>
 
       <EffectComposer>
         <Bloom

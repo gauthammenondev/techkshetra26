@@ -1,12 +1,5 @@
-/**
- * Behavior: Animated solar flare arcs rising from the Sun's crown.
- * - Bezier tube meshes rebuilt each frame at the new sphere position
- * - Emissive color values > 1.0 so bloom picks them up
- * - Count scales with GPU tier
- */
-
 import type React from 'react'
-import { useRef } from 'react'
+import { useRef, useMemo } from 'react'
 import { useFrame } from '@react-three/fiber'
 import {
   QuadraticBezierCurve3,
@@ -18,8 +11,8 @@ import {
 import type { GPUTierLevel } from '../../types/sun.types.ts'
 
 const SPHERE_RADIUS = 8
-const SPHERE_CENTER_Y = -4           // Must match SunSphere
-const SPHERE_TOP_Y = SPHERE_CENTER_Y + SPHERE_RADIUS  // = +4
+const SPHERE_CENTER_Y = 0           // Must match SunSphere local center
+const SPHERE_TOP_Y = SPHERE_CENTER_Y + SPHERE_RADIUS  // = 8
 
 function getFlareCount(tier: GPUTierLevel): number {
   switch (tier) {
@@ -45,15 +38,10 @@ function generateFlareConfigs(count: number): readonly FlareConfig[] {
   }))
 }
 
-function createFlareCurve(config: FlareConfig, time: number): QuadraticBezierCurve3 {
-  const animatedAngle = config.angle
-    + Math.sin(time * config.speed + config.phase * Math.PI * 2) * 0.25
-
-  // Flares emerge from the crown surface
+function createFlareCurve(config: FlareConfig): QuadraticBezierCurve3 {
   const surfaceR = SPHERE_RADIUS * 0.25
-
-  const startAngle = animatedAngle - 0.12
-  const endAngle = animatedAngle + 0.12
+  const startAngle = config.angle - 0.12
+  const endAngle = config.angle + 0.12
 
   const start = new Vector3(
     Math.cos(startAngle) * surfaceR,
@@ -67,13 +55,10 @@ function createFlareCurve(config: FlareConfig, time: number): QuadraticBezierCur
     Math.sin(endAngle) * surfaceR,
   )
 
-  const heightOscillation = config.height
-    + Math.sin(time * config.speed * 1.5 + config.phase) * 0.25
-
   const control = new Vector3(
-    Math.cos(animatedAngle) * surfaceR * 0.5,
-    SPHERE_TOP_Y + heightOscillation,
-    Math.sin(animatedAngle) * surfaceR * 0.5,
+    Math.cos(config.angle) * surfaceR * 0.5,
+    SPHERE_TOP_Y + config.height,
+    Math.sin(config.angle) * surfaceR * 0.5,
   )
 
   return new QuadraticBezierCurve3(start, control, end)
@@ -88,7 +73,17 @@ export function SunFlares({ gpuTier, reducedMotion }: SunFlaresProps): React.JSX
   const groupRef = useRef<Group>(null)
   const timeRef = useRef(0)
   const flareCount = getFlareCount(gpuTier)
-  const configs = useRef(generateFlareConfigs(flareCount))
+
+  // Generate flare configurations once on mount
+  const configs = useMemo(() => generateFlareConfigs(flareCount), [flareCount])
+
+  // Pre-generate tube geometries once to avoid garbage collection and GPU upload overhead
+  const geometries = useMemo(() => {
+    return configs.map((config) => {
+      const curve = createFlareCurve(config)
+      return new TubeGeometry(curve, 16, 0.05, 6, false)
+    })
+  }, [configs])
 
   useFrame((_state, delta) => {
     if (reducedMotion) return
@@ -98,41 +93,32 @@ export function SunFlares({ gpuTier, reducedMotion }: SunFlaresProps): React.JSX
     if (!group) return
 
     group.children.forEach((child, index) => {
-      const config = configs.current[index]
+      const config = configs[index]
       if (!config) return
 
       const mesh = child as Mesh
-      const curve = createFlareCurve(config, timeRef.current)
-      const newGeometry = new TubeGeometry(curve, 16, 0.05, 6, false)
 
-      mesh.geometry.dispose()
-      mesh.geometry = newGeometry
+      // Horizontal drift/sway along the crown
+      mesh.rotation.y = Math.sin(timeRef.current * config.speed + config.phase * Math.PI * 2) * 0.12
+
+      // Vertical pulse height scaling (simulates flare eruption)
+      const scaleY = 1.0 + Math.sin(timeRef.current * config.speed * 1.5 + config.phase) * 0.08
+      mesh.scale.set(1.0, scaleY, 1.0)
     })
   })
 
   return (
     <group ref={groupRef}>
-      {Array.from({ length: flareCount }, (_, i) => {
-        const config = configs.current[i]
-        if (!config) return null
-
-        const curve = createFlareCurve(config, 0)
-
-        return (
-          <mesh key={i}>
-            <primitive
-              object={new TubeGeometry(curve, 16, 0.05, 6, false)}
-              attach="geometry"
-            />
-            <meshBasicMaterial
-              color={[2.5, 0.7, 0.15]}
-              toneMapped={false}
-              transparent
-              opacity={0.85}
-            />
-          </mesh>
-        )
-      })}
+      {geometries.map((geometry, i) => (
+        <mesh key={i} geometry={geometry}>
+          <meshBasicMaterial
+            color={[2.5, 0.7, 0.15]}
+            toneMapped={false}
+            transparent
+            opacity={0.85}
+          />
+        </mesh>
+      ))}
     </group>
   )
 }
