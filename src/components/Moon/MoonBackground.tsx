@@ -10,7 +10,7 @@ type MoonBackgroundProps = {
 /**
  * Behavior: Renders the Moon image in a fixed viewport-filling layer.
  * - Image starts invisible (opacity 0) and fades in on load.
- * - Parent controls positioning via the forwarded ref (direct DOM writes).
+ * - Parent controls positioning and layer opacity via the forwarded ref (direct DOM writes).
  * - Pointer events pass through to content below.
  * - Background color matches the page to prevent blank flash during load.
  */
@@ -23,7 +23,7 @@ export function MoonBackground({ ref }: MoonBackgroundProps): React.JSX.Element 
 
   return (
     <div className={styles.layer} aria-hidden="true">
-      <div ref={ref} className={styles.moonWrapper}>
+      <div ref={ref} className={styles.moonWrapper} style={{ willChange: 'transform, opacity' }}>
         <img
           src={moonImageSrc}
           alt=""

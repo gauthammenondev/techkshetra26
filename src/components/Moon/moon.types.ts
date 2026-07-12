@@ -10,6 +10,12 @@
 /** Semantic label for the Moon's current scroll state. */
 export type MoonState = 'title' | 'content' | 'footer'
 
+export type MoonKeyframe = {
+  readonly translateY: number
+  readonly scale: number
+  readonly opacity: number
+}
+
 /** Configuration for the Moon scroll system. All values are readonly. */
 export type MoonConfig = {
   /** Scale factor: Moon rendered width = zoomScale × viewport width. */
@@ -26,12 +32,12 @@ export type MoonConfig = {
 
 /** Computed geometry for Moon positioning, recalculated on resize. */
 export type MoonGeometry = {
-  /** translateY when Moon's top-horizon tip aligns with 50vh. */
-  readonly targetA: number
-  /** translateY when Moon center aligns with viewport center. */
-  readonly targetB: number
-  /** translateY when Moon's bottom-horizon tip aligns with 50vh. */
-  readonly targetC: number
+  /** keyframe state when Moon's top-horizon tip aligns with 50vh. */
+  readonly targetA: MoonKeyframe
+  /** keyframe state when Moon center aligns with viewport center. */
+  readonly targetB: MoonKeyframe
+  /** keyframe state when Moon's bottom-horizon tip aligns with 50vh. */
+  readonly targetC: MoonKeyframe
   /** Maximum scrollable distance (document height − viewport height). */
   readonly maxScroll: number
   /** Viewport height in pixels. */
@@ -92,10 +98,10 @@ export function getMoonState(rawP1: number, rawP2: number): MoonState {
  * Behavior: Computes Moon geometry from config and current viewport measurements.
  *
  * The Moon image is rendered as a square of `moonSizePx` (= zoomScale × viewportWidth).
- * Three keyframe translateY targets position the Moon so that:
- *   A — top-horizon tip touches viewport midline (50vh)
- *   B — Moon center aligns with viewport center
- *   C — bottom-horizon tip touches viewport midline (50vh)
+ * Three keyframe targets position the Moon so that:
+ *   A — top-horizon tip touches viewport midline (50vh), opacity 1.0
+ *   B — Moon center aligns with viewport center, opacity 0.1
+ *   C — bottom-horizon tip touches viewport midline (50vh), opacity 1.0
  *
  * Scroll is divided into two transition phases:
  *   Phase 1: scrollY 0 → phase1End          (title → content, A → B)
@@ -110,14 +116,26 @@ export function computeGeometry(
 ): MoonGeometry {
   const moonSizePx = config.zoomScale * viewportWidth
 
-  // Target A: Moon's top edge (top-horizon tip) at 50vh
-  const targetA = viewportHeight / 2
+  // Target A: Moon's top edge (top-horizon tip) at 50vh, full opacity
+  const targetA: MoonKeyframe = {
+    translateY: viewportHeight / 2,
+    scale: 1.0,
+    opacity: 1.0,
+  }
 
-  // Target B: Moon's center at viewport center
-  const targetB = (viewportHeight - moonSizePx) / 2
+  // Target B: Moon's center at viewport center, reduced opacity
+  const targetB: MoonKeyframe = {
+    translateY: (viewportHeight - moonSizePx) / 2,
+    scale: 1.0,
+    opacity: 0.1,
+  }
 
-  // Target C: Moon's bottom edge (bottom-horizon tip) at 50vh
-  const targetC = viewportHeight / 2 - moonSizePx
+  // Target C: Moon's bottom edge (bottom-horizon tip) at 50vh, full opacity
+  const targetC: MoonKeyframe = {
+    translateY: viewportHeight / 2 - moonSizePx,
+    scale: 1.0,
+    opacity: 1.0,
+  }
 
   const maxScroll = Math.max(totalScrollHeight - viewportHeight, 1)
   const titleHeightPx = (config.titleHeightVh / 100) * viewportHeight

@@ -12,15 +12,6 @@
   background: transparent;
 }
 
-.navLeft,
-.navRight {
-  flex: 1;
-}
-
-.navRight {
-  display: flex;
-  justify-content: flex-end;
-}
 
 .navList {
   display: flex;

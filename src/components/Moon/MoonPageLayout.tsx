@@ -24,9 +24,9 @@ type MoonPageLayoutProps = {
 /**
  * Behavior: Orchestrates the Moon 3-state scroll system.
  * - Renders MoonBackground (fixed layer, z-index 0) and three scroll sections (z-index 1).
- * - Computes scroll progress → eased sub-progress → Moon translateY each frame.
+ * - Computes scroll progress → eased sub-progress → Moon translateY and opacity each frame.
  * - Recalculates geometry on viewport resize via ResizeObserver.
- * - All transform writes use direct DOM ref updates inside rAF — no React state.
+ * - All transform and opacity writes use direct DOM ref updates inside rAF — no React state.
  * - Respects prefers-reduced-motion: skips lerp damping, uses direct scroll mapping.
  */
 export function MoonPageLayout({
@@ -41,6 +41,7 @@ export function MoonPageLayout({
   const wrapperRef = useRef<HTMLDivElement | null>(null)
   const geometryRef = useRef<MoonGeometry | null>(null)
   const renderedYRef = useRef<number | null>(null)
+  const renderedOpacityRef = useRef<number | null>(null)
   const reducedMotion = usePrefersReducedMotion()
 
   // Behavior: Reset scroll to top on mount (route change) before paint.
@@ -108,13 +109,20 @@ export function MoonPageLayout({
     const easedP2 = easeInOutCubic(rawP2)
 
     // Interpolate Moon Y through keyframes: A → B → C
-    const phase1Y = lerp(geo.targetA, geo.targetB, easedP1)
-    const targetY = lerp(phase1Y, geo.targetC, easedP2)
+    const phase1Y = lerp(geo.targetA.translateY, geo.targetB.translateY, easedP1)
+    const targetY = lerp(phase1Y, geo.targetC.translateY, easedP2)
+
+    // Interpolate Moon opacity through keyframes: A → B → C
+    const phase1Opacity = lerp(geo.targetA.opacity, geo.targetB.opacity, easedP1)
+    const targetOpacity = lerp(phase1Opacity, geo.targetC.opacity, easedP2)
 
     // Apply hybrid smoothing (lerp damping) or direct mapping
     let finalY: number
-    if (reducedMotion.current || renderedYRef.current === null) {
+    let finalOpacity: number
+    
+    if (reducedMotion.current || renderedYRef.current === null || renderedOpacityRef.current === null) {
       finalY = targetY
+      finalOpacity = targetOpacity
     } else {
       finalY =
         renderedYRef.current +
@@ -123,10 +131,21 @@ export function MoonPageLayout({
       if (Math.abs(finalY - targetY) < 0.5) {
         finalY = targetY
       }
+
+      finalOpacity =
+        renderedOpacityRef.current +
+        (targetOpacity - renderedOpacityRef.current) * lerpDamping
+      // Snap when close enough to prevent precision drift
+      if (Math.abs(finalOpacity - targetOpacity) < 0.001) {
+        finalOpacity = targetOpacity
+      }
     }
 
     renderedYRef.current = finalY
+    renderedOpacityRef.current = finalOpacity
+    
     moon.style.transform = `translate3d(-50%, ${finalY}px, 0)`
+    moon.style.opacity = finalOpacity.toString()
   })
 
   return (
