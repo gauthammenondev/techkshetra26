@@ -1,6 +1,6 @@
 import type React from 'react'
 import { forwardRef } from 'react'
-import styles from './PageTitle.module.css'
+import styles from './css/PageTitle.module.css'
 
 type PageTitleProps = {
   readonly children: React.ReactNode

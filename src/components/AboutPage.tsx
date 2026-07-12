@@ -1,7 +1,7 @@
 import type React from 'react'
-import { MoonPageLayout } from '../../Moon/MoonPageLayout.tsx'
-import { Footer } from '../../Footer/Footer.tsx'
-import styles from '../Page.module.css'
+import { MoonPageLayout } from './MoonPageLayout.tsx'
+import { Footer } from './Footer.tsx'
+import styles from './css/Page.module.css'
 
 /**
  * Behavior: About page with Moon scroll narrative.

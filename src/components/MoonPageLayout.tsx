@@ -1,9 +1,9 @@
 import type React from 'react'
 import { useEffect, useLayoutEffect, useRef, useState, useCallback } from 'react'
-import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion.ts'
-import { useRafScroll } from '../../hooks/useRafScroll.ts'
-import { useTitleAnimation } from '../../hooks/useTitleAnimation.ts'
-import { PageTitle } from '../Title/PageTitle.tsx'
+import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion.ts'
+import { useRafScroll } from '../hooks/useRafScroll.ts'
+import { useTitleAnimation } from '../hooks/useTitleAnimation.ts'
+import { PageTitle } from './PageTitle.tsx'
 import {
   DEFAULT_MOON_CONFIG,
   computeGeometry,
@@ -15,7 +15,7 @@ import {
   type MoonGeometry,
   type RotationDirection,
 } from './moon.types.ts'
-import styles from './MoonPageLayout.module.css'
+import styles from './css/MoonPageLayout.module.css'
 
 // Global state for continuous animation across page mounts.
 let globalRenderedY: number | null = null

@@ -1,9 +1,9 @@
 import type React from 'react'
 import { useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import jubileeLogo from '../../assets/Jubilee.png'
-import rsetLogo from '../../assets/RSET.png'
-import styles from './Footer.module.css'
+import jubileeLogo from '../assets/Jubilee.png'
+import rsetLogo from '../assets/RSET.png'
+import styles from './css/Footer.module.css'
 
 export function Footer(): React.JSX.Element {
   const form = useRef<HTMLFormElement>(null)

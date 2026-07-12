@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { TITLE_ANIM_CONFIG, type RotationDirection } from '../components/Moon/moon.types.ts'
+import { TITLE_ANIM_CONFIG, type RotationDirection } from '../components/moon.types.ts'
 import { usePrefersReducedMotion } from './usePrefersReducedMotion.ts'
 
 export function useTitleAnimation(

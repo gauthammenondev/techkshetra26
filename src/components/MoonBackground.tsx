@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
-import moonImageSrc from '../../assets/Moon.png'
+import moonImageSrc from '../assets/Moon.png'
 import { globalMoonRef } from './moon.types.ts'
-import styles from './MoonBackground.module.css'
+import styles from './css/MoonBackground.module.css'
 
 /**
  * Behavior: Renders the Moon image in a fixed viewport-filling layer.

@@ -1,8 +1,8 @@
 import type React from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
-import { NAV_ITEMS_LEFT, NAV_ITEMS_RIGHT } from '../../types/sun.types.ts'
-import type { NavItem } from '../../types/sun.types.ts'
-import styles from './Navigation.module.css'
+import { NAV_ITEMS_LEFT, NAV_ITEMS_RIGHT } from '../types/sun.types.ts'
+import type { NavItem } from '../types/sun.types.ts'
+import styles from './css/Navigation.module.css'
 
 function NavList({
   items,
