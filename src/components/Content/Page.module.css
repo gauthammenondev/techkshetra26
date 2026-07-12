@@ -1,26 +1,14 @@
 /*
- * Page content sits in the upper portion of the viewport.
- * Bottom padding reserves space so text never overlaps the Sun crown.
- * z-index 5 keeps it above the canvas but below the nav.
+ * Text and content styles for page sections within MoonPageLayout.
+ * Layout is handled by MoonPageLayout — these are text-only styles.
  */
-.page {
-    position: relative;
-    z-index: 5;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 50vh;
-    padding: 8rem 2rem 4rem;
-    text-align: center;
-    pointer-events: none;
-}
 
 .heading {
     font-size: clamp(2rem, 6vw, 4rem);
     font-weight: 700;
     letter-spacing: 0.05em;
     color: #fff;
+    text-align: center;
     text-shadow: 0 0 40px rgba(255, 120, 30, 0.4);
 }
 
@@ -29,4 +17,23 @@
     font-size: clamp(0.9rem, 2vw, 1.2rem);
     color: rgba(255, 255, 255, 0.55);
     letter-spacing: 0.06em;
+    text-align: center;
+}
+
+.contentBody {
+    max-width: 800px;
+    margin: 0 auto;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.7;
+}
+
+.contentBody p {
+    margin-bottom: 1.5rem;
+}
+
+.footerBody {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.9rem;
+    letter-spacing: 0.05em;
 }

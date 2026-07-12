@@ -1,9 +1,9 @@
 /**
  * Behavior: Root application layout.
  * - Navigation fixed at top (z-index 10)
- * - Sun WebGL canvas fills the viewport (z-index 0)
+ * - Moon background renders per-page via MoonPageLayout (z-index 0)
  * - Route-based pages render via React Router
- * - No content panel overlay — pages are separate routes
+ * - Each page uses MoonPageLayout for scroll-driven Moon positioning
  */
 
 import type React from 'react'

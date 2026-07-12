@@ -1,0 +1,34 @@
+/*
+ * MoonBackground — fixed viewport layer and image styles.
+ * The Moon image starts invisible and fades in on load.
+ * All positioning is controlled via JS transform writes on .moonWrapper.
+ */
+
+.layer {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background: #00000f;
+}
+
+.moonWrapper {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  will-change: transform;
+}
+
+.moonImage {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.moonImageLoaded {
+  opacity: 1;
+}
