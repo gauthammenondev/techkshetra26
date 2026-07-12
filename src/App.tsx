@@ -9,7 +9,6 @@
 import type React from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { Navigation } from './components/Navigation/Navigation.tsx'
-import { Sun } from './components/Sun/Sun.tsx'
 import { HomePage } from './components/Content/pages/HomePage.tsx'
 import { EventsPage } from './components/Content/pages/EventsPage.tsx'
 import { GalleryPage } from './components/Content/pages/GalleryPage.tsx'
@@ -21,7 +20,6 @@ function App(): React.JSX.Element {
   return (
     <div className={styles.root}>
       <Navigation />
-      <Sun />
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/events" element={<EventsPage />} />
