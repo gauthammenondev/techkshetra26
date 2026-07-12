@@ -1,6 +1,5 @@
 import type React from 'react'
 import { useEffect, useLayoutEffect, useRef } from 'react'
-import { MoonBackground } from './MoonBackground.tsx'
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion.ts'
 import { useRafScroll } from '../../hooks/useRafScroll.ts'
 import {
@@ -9,48 +8,57 @@ import {
   easeInOutCubic,
   lerp,
   clamp,
+  globalMoonRef,
   type MoonConfig,
   type MoonGeometry,
 } from './moon.types.ts'
 import styles from './MoonPageLayout.module.css'
 
+// Global state for continuous animation across page mounts.
+// By persisting these values, the Moon inherits its exact position, opacity, 
+// and rotation from the previous page, allowing for completely seamless 
+// transitions during route changes without unmounting or snapping.
+let globalRenderedY: number | null = null
+let globalRenderedOpacity: number | null = null
+let globalRenderedAngle: number | null = null
+
 type MoonPageLayoutProps = {
   readonly title: React.ReactNode
   readonly content: React.ReactNode
   readonly footer: React.ReactNode
+  readonly rotation?: number
   readonly config?: Partial<MoonConfig>
 }
 
 /**
- * Behavior: Orchestrates the Moon 3-state scroll system.
- * - Renders MoonBackground (fixed layer, z-index 0) and three scroll sections (z-index 1).
+ * Behavior: Orchestrates the Moon 3-state scroll system and rotation.
+ * - Renders three scroll sections (z-index 1).
  * - Computes scroll progress → eased sub-progress → Moon translateY and opacity each frame.
+ * - Lerps Moon rotation smoothly to the target rotation prop on route change.
  * - Recalculates geometry on viewport resize via ResizeObserver.
- * - All transform and opacity writes use direct DOM ref updates inside rAF — no React state.
- * - Respects prefers-reduced-motion: skips lerp damping, uses direct scroll mapping.
+ * - All transform and opacity writes use direct DOM ref updates inside rAF on the globally persisted MoonBackground layer.
+ * - Respects prefers-reduced-motion: skips lerp damping, uses direct mapping.
  */
 export function MoonPageLayout({
   title,
   content,
   footer,
+  rotation = 0,
   config,
 }: MoonPageLayoutProps): React.JSX.Element {
   const mergedConfig: MoonConfig = { ...DEFAULT_MOON_CONFIG, ...config }
 
-  const moonRef = useRef<HTMLDivElement | null>(null)
   const wrapperRef = useRef<HTMLDivElement | null>(null)
   const geometryRef = useRef<MoonGeometry | null>(null)
-  const renderedYRef = useRef<number | null>(null)
-  const renderedOpacityRef = useRef<number | null>(null)
   const reducedMotion = usePrefersReducedMotion()
 
-  // Behavior: Reset scroll to top on mount (route change) before paint.
+  // Behavior: Smooth scrolling to top is handled globally by App.tsx <ScrollToTop />,
+  // but we keep this layout effect as a fallback for structural positioning.
   useLayoutEffect(() => {
-    window.scrollTo(0, 0)
   }, [])
 
   // Extract config values for effect dependency tracking
-  const { zoomScale, lerpDamping, titleHeightVh, contentHeightVh, footerHeightVh } = mergedConfig
+  const { zoomScale, lerpDamping, rotationDamping, rotationSettleThreshold, titleHeightVh, contentHeightVh, footerHeightVh } = mergedConfig
 
   // Behavior: Compute and cache Moon geometry on mount and viewport changes.
   useEffect(() => {
@@ -64,12 +72,14 @@ export function MoonPageLayout({
         contentHeightVh,
         footerHeightVh,
         lerpDamping,
+        rotationDamping,
+        rotationSettleThreshold,
       }
       const geo = computeGeometry(effectConfig, vw, vh, totalHeight)
       geometryRef.current = geo
 
       // Size the Moon wrapper via direct DOM write (only recalculated on resize)
-      const moon = moonRef.current
+      const moon = globalMoonRef.current
       if (moon) {
         moon.style.width = `${geo.moonSizePx}px`
         moon.style.height = `${geo.moonSizePx}px`
@@ -89,12 +99,12 @@ export function MoonPageLayout({
       resizeObserver.disconnect()
       window.removeEventListener('resize', updateGeometry)
     }
-  }, [zoomScale, lerpDamping, titleHeightVh, contentHeightVh, footerHeightVh])
+  }, [zoomScale, lerpDamping, rotationDamping, rotationSettleThreshold, titleHeightVh, contentHeightVh, footerHeightVh])
 
-  // Behavior: Map scroll position → eased progress → Moon transform each animation frame.
+  // Behavior: Map scroll position → eased progress → Moon transform/rotation each animation frame.
   useRafScroll((scrollY: number) => {
     const geo = geometryRef.current
-    const moon = moonRef.current
+    const moon = globalMoonRef.current
     if (!geo || !moon) return
 
     // Compute raw sub-progresses for each transition phase
@@ -119,58 +129,67 @@ export function MoonPageLayout({
     // Apply hybrid smoothing (lerp damping) or direct mapping
     let finalY: number
     let finalOpacity: number
+    let finalAngle: number
     
-    if (reducedMotion.current || renderedYRef.current === null || renderedOpacityRef.current === null) {
+    if (reducedMotion.current || globalRenderedY === null || globalRenderedOpacity === null || globalRenderedAngle === null) {
       finalY = targetY
       finalOpacity = targetOpacity
+      finalAngle = rotation
     } else {
       finalY =
-        renderedYRef.current +
-        (targetY - renderedYRef.current) * lerpDamping
+        globalRenderedY +
+        (targetY - globalRenderedY) * lerpDamping
       // Snap when close enough to prevent sub-pixel drift
       if (Math.abs(finalY - targetY) < 0.5) {
         finalY = targetY
       }
 
       finalOpacity =
-        renderedOpacityRef.current +
-        (targetOpacity - renderedOpacityRef.current) * lerpDamping
+        globalRenderedOpacity +
+        (targetOpacity - globalRenderedOpacity) * lerpDamping
       // Snap when close enough to prevent precision drift
       if (Math.abs(finalOpacity - targetOpacity) < 0.001) {
         finalOpacity = targetOpacity
       }
+
+      finalAngle =
+        globalRenderedAngle +
+        (rotation - globalRenderedAngle) * rotationDamping
+      // Snap when close enough to prevent infinite micro-updates
+      if (Math.abs(rotation - finalAngle) < rotationSettleThreshold) {
+        finalAngle = rotation
+      }
     }
 
-    renderedYRef.current = finalY
-    renderedOpacityRef.current = finalOpacity
+    globalRenderedY = finalY
+    globalRenderedOpacity = finalOpacity
+    globalRenderedAngle = finalAngle
     
-    moon.style.transform = `translate3d(-50%, ${finalY}px, 0)`
+    // Single unified DOM write per frame
+    moon.style.transform = `translate3d(-50%, ${finalY}px, 0) scale(1) rotate(${finalAngle}deg)`
     moon.style.opacity = finalOpacity.toString()
   })
 
   return (
-    <>
-      <MoonBackground ref={moonRef} />
-      <div ref={wrapperRef} className={styles.scrollContainer}>
-        <section
-          className={styles.titleSection}
-          style={{ height: `${mergedConfig.titleHeightVh}vh` }}
-        >
-          {title}
-        </section>
-        <main
-          className={styles.contentSection}
-          style={{ minHeight: `${mergedConfig.contentHeightVh}vh` }}
-        >
-          {content}
-        </main>
-        <footer
-          className={styles.footerSection}
-          style={{ height: `${mergedConfig.footerHeightVh}vh` }}
-        >
-          {footer}
-        </footer>
-      </div>
-    </>
+    <div ref={wrapperRef} className={styles.scrollContainer}>
+      <section
+        className={styles.titleSection}
+        style={{ height: `${mergedConfig.titleHeightVh}vh` }}
+      >
+        {title}
+      </section>
+      <main
+        className={styles.contentSection}
+        style={{ minHeight: `${mergedConfig.contentHeightVh}vh` }}
+      >
+        {content}
+      </main>
+      <footer
+        className={styles.footerSection}
+        style={{ height: `${mergedConfig.footerHeightVh}vh` }}
+      >
+        {footer}
+      </footer>
+    </div>
   )
 }

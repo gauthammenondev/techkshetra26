@@ -11,6 +11,7 @@ import styles from '../Page.module.css'
 export function ContactPage(): React.JSX.Element {
   return (
     <MoonPageLayout
+      rotation={80}
       title={
         <>
           <h1 className={styles.heading}>Contact Us</h1>

@@ -11,6 +11,7 @@ import styles from '../Page.module.css'
 export function AboutPage(): React.JSX.Element {
   return (
     <MoonPageLayout
+      rotation={60}
       title={
         <>
           <h1 className={styles.heading}>About</h1>

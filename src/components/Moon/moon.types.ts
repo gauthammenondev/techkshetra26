@@ -22,6 +22,10 @@ export type MoonConfig = {
   readonly zoomScale: number
   /** Lerp damping factor for hybrid smoothing (0 < d < 1). Ignored with reduced motion. */
   readonly lerpDamping: number
+  /** Lerp damping factor for Moon rotation (0 < d < 1). */
+  readonly rotationDamping: number
+  /** Threshold below which Moon rotation lerp snaps to target (degrees). */
+  readonly rotationSettleThreshold: number
   /** Title section height in vh units. */
   readonly titleHeightVh: number
   /** Content section minimum height in vh units. */
@@ -57,10 +61,15 @@ export type MoonGeometry = {
 export const DEFAULT_MOON_CONFIG: MoonConfig = {
   zoomScale: 3.0,
   lerpDamping: 0.1,
+  rotationDamping: 0.08,
+  rotationSettleThreshold: 0.01,
   titleHeightVh: 100,
   contentHeightVh: 300,
   footerHeightVh: 100,
 } as const
+
+import React from 'react'
+export const globalMoonRef = React.createRef<HTMLDivElement>()
 
 /* ------------------------------------------------------------------ */
 /*  Pure utility functions                                             */
@@ -99,9 +108,9 @@ export function getMoonState(rawP1: number, rawP2: number): MoonState {
  *
  * The Moon image is rendered as a square of `moonSizePx` (= zoomScale × viewportWidth).
  * Three keyframe targets position the Moon so that:
- *   A — top-horizon tip touches viewport midline (50vh), opacity 1.0
- *   B — Moon center aligns with viewport center, opacity 0.1
- *   C — bottom-horizon tip touches viewport midline (50vh), opacity 1.0
+ *   A — top-horizon tip touches viewport midline (50vh), opacity 0.9
+ *   B — Moon center aligns with viewport center, opacity 0.3
+ *   C — bottom-horizon tip touches viewport midline (50vh), opacity 0.9
  *
  * Scroll is divided into two transition phases:
  *   Phase 1: scrollY 0 → phase1End          (title → content, A → B)
@@ -120,21 +129,21 @@ export function computeGeometry(
   const targetA: MoonKeyframe = {
     translateY: viewportHeight / 2,
     scale: 1.0,
-    opacity: 1.0,
+    opacity: 0.9,
   }
 
   // Target B: Moon's center at viewport center, reduced opacity
   const targetB: MoonKeyframe = {
     translateY: (viewportHeight - moonSizePx) / 2,
     scale: 1.0,
-    opacity: 0.1,
+    opacity: 0.3,
   }
 
   // Target C: Moon's bottom edge (bottom-horizon tip) at 50vh, full opacity
   const targetC: MoonKeyframe = {
     translateY: viewportHeight / 2 - moonSizePx,
     scale: 1.0,
-    opacity: 1.0,
+    opacity: 0.9,
   }
 
   const maxScroll = Math.max(totalScrollHeight - viewportHeight, 1)

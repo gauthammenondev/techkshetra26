@@ -11,6 +11,7 @@ import styles from '../Page.module.css'
 export function GalleryPage(): React.JSX.Element {
   return (
     <MoonPageLayout
+      rotation={40}
       title={
         <>
           <h1 className={styles.heading}>Gallery</h1>
