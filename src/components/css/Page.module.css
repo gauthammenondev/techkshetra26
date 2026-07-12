@@ -1,0 +1,83 @@
+/*
+ * Text and content styles for page sections within MoonPageLayout.
+ * Layout is handled by MoonPageLayout — these are text-only styles.
+ */
+
+.heading {
+    font-size: clamp(2rem, 6vw, 4rem);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: #fff;
+    text-align: center;
+    text-shadow: 0 0 40px rgba(255, 120, 30, 0.4);
+}
+
+.subheading {
+    margin-top: 1rem;
+    font-size: clamp(0.9rem, 2vw, 1.2rem);
+    color: rgba(255, 255, 255, 0.55);
+    letter-spacing: 0.06em;
+    text-align: center;
+}
+
+.contentBody {
+    max-width: 800px;
+    margin: 0 auto;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.7;
+}
+
+.contentBody p {
+    margin-bottom: 1.5rem;
+}
+
+.footerBody {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.9rem;
+    letter-spacing: 0.05em;
+}
+
+/* --- PLACEHOLDER STYLES --- */
+.placeholderSection {
+    margin-top: 3rem;
+    padding: 2rem;
+    border: 1px dashed rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.02);
+    text-align: center;
+}
+
+.placeholderHeading {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.placeholderGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.placeholderCard {
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+}
+
+.placeholderCard h3 {
+    font-size: 1.1rem;
+    color: #ff3b3b;
+    margin-bottom: 0.5rem;
+}
+
+.placeholderCard p {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.6);
+}

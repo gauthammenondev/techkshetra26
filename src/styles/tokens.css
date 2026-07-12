@@ -20,7 +20,7 @@
   --color-midtone-purple: #622A87;        /* Vibrant Purple */
 
   /* --- Font Families --- */
-  --font-family-primary: 'Noto Serif', Georgia, 'Times New Roman', serif;
+  --font-family-primary: 'Noto Serif';
 
   /* --- Font Sizes (Modular Scale — ratio 1.25) --- */
   --font-size-sm: 0.8rem;       /* 12.8px */

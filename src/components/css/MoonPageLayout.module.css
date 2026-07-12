@@ -1,0 +1,34 @@
+/*
+ * MoonPageLayout — scroll section structure.
+ * Three sections stack vertically: title, content, footer.
+ * The scroll container sits above the fixed Moon layer (z-index 1 > 0).
+ */
+
+.scrollContainer {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+}
+
+.titleSection {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.contentSection {
+  position: relative;
+  padding: 4rem 2rem;
+}
+
+.footerSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0;
+}
