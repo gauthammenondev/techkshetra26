@@ -1,0 +1,13 @@
+/*
+ * Sun container — fixed, fills the full viewport.
+ * pointer-events: none so nav and page links remain clickable.
+ * The Three.js camera controls what fraction of the sphere is visible.
+ */
+.sunContainer {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}

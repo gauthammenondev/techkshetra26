@@ -4,7 +4,8 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  padding: 1rem 2rem; /* vertical | horizontal breathing room */
+  padding: var(--space-4) var(--space-8);
+  background-color: transparent;
 }
 
 /* Left navigation group — pushes links toward center */
@@ -25,21 +26,35 @@
 .navList {
   display: flex;
   list-style: none;
-  gap: 1.5rem; /* spacing between nav items */
+  gap: var(--space-6);
 }
 
-/* <li> wrapper — no additional styling needed yet */
+/* <li> wrapper */
 .navItem {
   display: flex;
   align-items: center;
 }
 
-/* <a> — clean link appearance without default underline */
+/* <a> — styled link with token-driven hover/focus transitions */
 .navLink {
   text-decoration: none;
-  color: inherit;
-  font-size: 1rem;
-  cursor: default; /* indicates non-interactive until subpages exist */
+  color: var(--color-text-primary);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--letter-spacing-wide);
+  cursor: default;
+  transition: color var(--transition-base);
+  border-radius: var(--radius-sm);
+}
+
+.navLink:hover {
+  color: var(--color-accent-pink);
+}
+
+.navLink:focus-visible {
+  color: var(--color-accent-pink);
+  outline: 2px solid var(--color-accent-pink);
+  outline-offset: 2px;
 }
 
 /* Center logo container — natural width, no flex growth */
@@ -48,20 +63,23 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 2rem; /* horizontal space separating logo from nav groups */
+  padding: 0 var(--space-8);
 }
 
-/* Visible placeholder box so the logo area is clearly identifiable */
+/* Visible placeholder box — distinctly styled with accent tokens */
 .logoPlaceholder {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 5rem; /* ensures the placeholder has visible presence */
-  min-height: 2.5rem;
-  border: 0.125rem dashed currentcolor; /* 2px dashed border for visual distinction */
-  border-radius: 0.25rem;
-  padding: 0.25rem 0.75rem;
-  font-size: 1.125rem;
-  font-weight: 700;
+  min-width: 5rem;
+  min-height: var(--space-10);
+  border: 2px solid var(--color-midtone-purple);
+  border-radius: var(--radius-md);
+  padding: var(--space-1) var(--space-3);
+  background-color: var(--color-background-primary);
+  color: var(--color-accent-orange);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-wider);
   user-select: none;
 }

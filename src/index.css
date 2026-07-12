@@ -1,4 +1,3 @@
-/* Minimal reset only — no theme, no color, no font choices yet */
 *,
 *::before,
 *::after {
@@ -7,6 +6,16 @@
   padding: 0;
 }
 
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+}
+
 body {
-  min-height: 100vh;
+  background: #00000f;
+  color: #fff;
+  font-family: system-ui, sans-serif;
+  overflow-x: hidden;
 }

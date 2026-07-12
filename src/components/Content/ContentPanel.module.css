@@ -1,0 +1,19 @@
+/* Content panel — positioned above the Sun, with fade transitions */
+.contentPanel {
+  position: relative;
+  z-index: 5;
+  min-height: 50vh;
+  padding: var(--space-8) var(--space-8) var(--space-16);
+  opacity: 1;
+  transition: opacity 300ms ease;
+}
+
+.fadeOut {
+  opacity: 0;
+  transition: opacity 200ms ease;
+}
+
+.fadeIn {
+  opacity: 1;
+  transition: opacity 300ms ease;
+}
