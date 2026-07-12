@@ -119,7 +119,7 @@ export function Footer(): React.JSX.Element {
       {/* Developer credits */}
       <div className={styles.footerBottom}>
         <p className={styles.creditsText}>Developed with ❤️ by the Techkshetra website team</p>
-        <p className={styles.copyrightText}>© 2026 Techkshetra, All Rights Reserved</p>
+        <p className={styles.copyrightText}>© 2026, All Rights Reserved</p>
       </div>
     </footer>
   )

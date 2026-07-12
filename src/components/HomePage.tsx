@@ -32,6 +32,25 @@ export function HomePage(): React.JSX.Element {
             hackathons to tech talks by industry leaders — Techkshetra offers
             something for every curious mind.
           </p>
+
+          <div className={styles.placeholderSection}>
+            <h2 className={styles.placeholderHeading}>Countdown Timer</h2>
+            <p>00 : 00 : 00 : 00</p>
+          </div>
+
+          <div className={styles.placeholderSection}>
+            <h2 className={styles.placeholderHeading}>Sponsors</h2>
+            <div className={styles.placeholderGrid}>
+              <div className={styles.placeholderCard}>
+                <h3>Title Sponsor</h3>
+                <p>Logo goes here</p>
+              </div>
+              <div className={styles.placeholderCard}>
+                <h3>Co-Sponsor</h3>
+                <p>Logo goes here</p>
+              </div>
+            </div>
+          </div>
         </div>
       }
       footer={<Footer />}
