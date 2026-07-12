@@ -1,12 +1,13 @@
 import type React from 'react'
 import { MoonPageLayout } from '../../Moon/MoonPageLayout.tsx'
+import { Footer } from '../../Footer/Footer.tsx'
 import styles from '../Page.module.css'
 
 /**
  * Behavior: Home page with Moon scroll narrative.
  * - Title state: event name and tagline centered in viewport.
  * - Content state: introduction to Techkshetra'26.
- * - Footer state: copyright attribution.
+ * - Footer state: footer component.
  */
 export function HomePage(): React.JSX.Element {
   return (
@@ -33,11 +34,7 @@ export function HomePage(): React.JSX.Element {
           </p>
         </div>
       }
-      footer={
-        <div className={styles.footerBody}>
-          <p>© 2026 Techkshetra · Rajagiri School of Engineering &amp; Technology</p>
-        </div>
-      }
+      footer={<Footer />}
     />
   )
 }

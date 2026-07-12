@@ -1,12 +1,13 @@
 import type React from 'react'
 import { MoonPageLayout } from '../../Moon/MoonPageLayout.tsx'
+import { Footer } from '../../Footer/Footer.tsx'
 import styles from '../Page.module.css'
 
 /**
  * Behavior: Contact page with Moon scroll narrative.
  * - Title state: contact heading centered in viewport.
  * - Content state: contact information.
- * - Footer state: copyright attribution.
+ * - Footer state: footer component.
  */
 export function ContactPage(): React.JSX.Element {
   return (
@@ -27,11 +28,7 @@ export function ContactPage(): React.JSX.Element {
           </p>
         </div>
       }
-      footer={
-        <div className={styles.footerBody}>
-          <p>© 2026 Techkshetra · Rajagiri School of Engineering &amp; Technology</p>
-        </div>
-      }
+      footer={<Footer />}
     />
   )
 }
