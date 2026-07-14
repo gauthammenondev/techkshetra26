@@ -1,0 +1,612 @@
+/*
+ * =============================================
+ * TECHKSHETRA "COMING SOON" — QR LANDING PAGE
+ * =============================================
+ * Standalone full-screen page for QR code scans.
+ * Dark, immersive, with Gothic Blackletter font
+ * and dramatic red "COMING SOON" typography.
+ */
+
+/* --- Base Layer --- */
+.pageWrapper {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: #050505;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: none;
+}
+
+/* --- Torch / Flashlight Overlay --- */
+.torchOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  background: radial-gradient(
+    circle var(--torch-size, 180px) at var(--mx, 50%) var(--my, 50%),
+    transparent 0%,
+    rgba(0, 0, 0, 0.25) 40%,
+    rgba(0, 0, 0, 0.65) 70%,
+    rgba(0, 0, 0, 0.88) 100%
+  );
+  transition: opacity 0.4s ease;
+}
+
+/* White torch glow that follows cursor (sits behind the dark overlay) */
+.torchGlow {
+  position: fixed;
+  z-index: 49;
+  pointer-events: none;
+  width: 360px;
+  height: 360px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0.04) 40%,
+    transparent 70%
+  );
+  transform: translate(-50%, -50%);
+  left: var(--mx-px, 50%);
+  top: var(--my-px, 50%);
+  transition: left 0.08s linear, top 0.08s linear;
+}
+
+/* Custom cursor dot */
+.cursorDot {
+  position: fixed;
+  z-index: 51;
+  pointer-events: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow:
+    0 0 12px 4px rgba(255, 255, 255, 0.4),
+    0 0 30px 8px rgba(255, 255, 255, 0.15);
+  transform: translate(-50%, -50%);
+  left: var(--mx-px, -100px);
+  top: var(--my-px, -100px);
+  transition: left 0.06s linear, top 0.06s linear;
+}
+
+/* Hide torch on touch-only devices */
+@media (hover: none) and (pointer: coarse) {
+  .pageWrapper {
+    cursor: auto;
+  }
+  .torchOverlay,
+  .torchGlow,
+  .cursorDot {
+    display: none;
+  }
+}
+
+/* --- Floating Particles (CSS-only) --- */
+.particlesLayer {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.particle {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(204, 0, 0, 0.15);
+  filter: blur(1px);
+  animation: particleFloat linear infinite;
+}
+
+.particle:nth-child(1) {
+  width: 4px; height: 4px;
+  left: 10%; bottom: -10%;
+  animation-duration: 18s;
+  animation-delay: 0s;
+}
+.particle:nth-child(2) {
+  width: 6px; height: 6px;
+  left: 25%; bottom: -10%;
+  animation-duration: 22s;
+  animation-delay: 2s;
+  background: rgba(255, 255, 255, 0.08);
+}
+.particle:nth-child(3) {
+  width: 3px; height: 3px;
+  left: 45%; bottom: -10%;
+  animation-duration: 16s;
+  animation-delay: 4s;
+}
+.particle:nth-child(4) {
+  width: 5px; height: 5px;
+  left: 60%; bottom: -10%;
+  animation-duration: 25s;
+  animation-delay: 1s;
+  background: rgba(255, 255, 255, 0.06);
+}
+.particle:nth-child(5) {
+  width: 4px; height: 4px;
+  left: 75%; bottom: -10%;
+  animation-duration: 20s;
+  animation-delay: 3s;
+}
+.particle:nth-child(6) {
+  width: 7px; height: 7px;
+  left: 88%; bottom: -10%;
+  animation-duration: 28s;
+  animation-delay: 5s;
+  background: rgba(204, 0, 0, 0.1);
+}
+.particle:nth-child(7) {
+  width: 3px; height: 3px;
+  left: 35%; bottom: -10%;
+  animation-duration: 15s;
+  animation-delay: 7s;
+  background: rgba(255, 255, 255, 0.05);
+}
+.particle:nth-child(8) {
+  width: 5px; height: 5px;
+  left: 55%; bottom: -10%;
+  animation-duration: 23s;
+  animation-delay: 6s;
+}
+
+@keyframes particleFloat {
+  0% {
+    transform: translateY(0) translateX(0) scale(1);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-110vh) translateX(30px) scale(0.5);
+    opacity: 0;
+  }
+}
+
+/* --- Watermark Text Layer --- */
+.watermarkLayer {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  opacity: 0;
+  animation: watermarkFadeIn 2s ease 1.5s forwards;
+}
+
+/*
+ * Inner wrapper holds TWO full-screen sets of text stacked vertically.
+ * Total height = 200vh. The animation slides from -50% (showing set 1)
+ * to 0% (showing set 2), then instantly resets — creating an infinite
+ * seamless downward scroll.
+ */
+.watermarkScroll {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+  height: 200vh;
+  animation: watermarkScrollDown 14s linear infinite;
+}
+
+.watermarkLine {
+  font-family: 'Inter', 'Noto Serif', sans-serif;
+  font-size: clamp(3rem, 10vw, 8rem);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: rgba(255, 255, 255, 0.022);
+  white-space: nowrap;
+  line-height: 1;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+@keyframes watermarkFadeIn {
+  to { opacity: 1; }
+}
+
+@keyframes watermarkScrollDown {
+  0% {
+    transform: translateY(-50%);
+  }
+  100% {
+    transform: translateY(0%);
+  }
+}
+
+/* --- Radial Glow Behind Content --- */
+.glowOrb {
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(180, 0, 0, 0.12) 0%, transparent 70%);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 0;
+  pointer-events: none;
+  animation: glowPulse 4s ease-in-out infinite alternate;
+}
+
+@keyframes glowPulse {
+  0% { transform: translate(-50%, -50%) scale(0.9); opacity: 0.6; }
+  100% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
+}
+
+/* --- Main Content --- */
+.heroContent {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem 1.5rem;
+  gap: 0;
+}
+
+/* "COMING SOON" — massive red text */
+.comingSoonText {
+  font-family: 'Inter', 'Noto Serif', sans-serif;
+  font-size: clamp(2.5rem, 12vw, 7rem);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  line-height: 1.05;
+  color: #cc0000;
+  text-shadow:
+    0 0 60px rgba(204, 0, 0, 0.3),
+    0 0 120px rgba(204, 0, 0, 0.15);
+  opacity: 0;
+  transform: translateY(30px) scale(0.95);
+  animation: heroReveal 1s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards;
+}
+
+/* "Techkshetra" — Ornate serif, readable */
+.techkshetraText {
+  font-family: 'Cinzel Decorative', 'Cinzel', 'Noto Serif', serif;
+  font-size: clamp(2.5rem, 12vw, 7.5rem);
+  font-weight: 700;
+  color: #cc0000;
+  line-height: 1.1;
+  margin-top: -0.05em;
+  text-shadow:
+    0 0 40px rgba(204, 0, 0, 0.25),
+    0 2px 4px rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  transform: translateY(40px);
+  animation: heroReveal 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.6s forwards;
+}
+
+/* Divider line */
+.divider {
+  width: clamp(60px, 15vw, 120px);
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #cc0000, transparent);
+  margin: 1.5rem 0;
+  opacity: 0;
+  animation: heroReveal 0.8s ease 1s forwards;
+}
+
+/* Tagline */
+.tagline {
+  font-family: 'Inter', 'Noto Serif', sans-serif;
+  font-size: clamp(0.7rem, 2vw, 0.95rem);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.35em;
+  color: rgba(255, 255, 255, 0.45);
+  opacity: 0;
+  transform: translateY(20px);
+  animation: heroReveal 0.8s ease 1.2s forwards;
+}
+
+/* Year badge */
+.yearBadge {
+  margin-top: 1.2rem;
+  font-family: 'Inter', 'Noto Serif', sans-serif;
+  font-size: clamp(0.65rem, 1.5vw, 0.85rem);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5em;
+  color: rgba(255, 255, 255, 0.25);
+  padding: 0.5rem 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 2px;
+  opacity: 0;
+  animation: heroReveal 0.8s ease 1.4s forwards;
+}
+
+@keyframes heroReveal {
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* --- Bottom Branding Bar --- */
+.brandingBar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.5rem 2rem 2rem;
+  padding-bottom: calc(2rem + env(safe-area-inset-bottom, 0px));
+  opacity: 0;
+  animation: heroReveal 0.8s ease 1.8s forwards;
+}
+
+.collegeName {
+  font-family: 'Inter', 'Noto Serif', sans-serif;
+  font-size: 0.6rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  color: rgba(255, 255, 255, 0.18);
+  text-align: center;
+}
+
+/* --- Scan line effect (subtle horizontal sweep) --- */
+.scanLine {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(204, 0, 0, 0.15) 20%,
+    rgba(204, 0, 0, 0.3) 50%,
+    rgba(204, 0, 0, 0.15) 80%,
+    transparent 100%
+  );
+  z-index: 1;
+  pointer-events: none;
+  animation: scanSweep 6s ease-in-out infinite;
+}
+
+@keyframes scanSweep {
+  0%, 100% { top: -1px; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  95% { top: 100%; opacity: 0; }
+}
+
+/* --- Corner Accents --- */
+.cornerAccent {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  animation: heroReveal 0.6s ease 2s forwards;
+}
+
+.cornerAccent::before,
+.cornerAccent::after {
+  content: '';
+  position: absolute;
+  background: rgba(204, 0, 0, 0.25);
+}
+
+.cornerTopLeft {
+  top: 24px;
+  left: 24px;
+}
+.cornerTopLeft::before {
+  top: 0; left: 0;
+  width: 20px; height: 1px;
+}
+.cornerTopLeft::after {
+  top: 0; left: 0;
+  width: 1px; height: 20px;
+}
+
+.cornerTopRight {
+  top: 24px;
+  right: 24px;
+}
+.cornerTopRight::before {
+  top: 0; right: 0;
+  width: 20px; height: 1px;
+}
+.cornerTopRight::after {
+  top: 0; right: 0;
+  width: 1px; height: 20px;
+}
+
+.cornerBottomLeft {
+  bottom: 24px;
+  left: 24px;
+}
+.cornerBottomLeft::before {
+  bottom: 0; left: 0;
+  width: 20px; height: 1px;
+}
+.cornerBottomLeft::after {
+  bottom: 0; left: 0;
+  width: 1px; height: 20px;
+}
+
+.cornerBottomRight {
+  bottom: 24px;
+  right: 24px;
+}
+.cornerBottomRight::before {
+  bottom: 0; right: 0;
+  width: 20px; height: 1px;
+}
+.cornerBottomRight::after {
+  bottom: 0; right: 0;
+  width: 1px; height: 20px;
+}
+
+/* --- Noise Texture Overlay --- */
+.noiseOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-size: 256px 256px;
+}
+
+/* --- Responsive: Phones & Tablets --- */
+
+/* Small phones (iPhone SE, Galaxy S8, etc.) */
+@media (max-width: 380px) {
+  .heroContent {
+    padding: 1rem 0.75rem;
+  }
+
+  .comingSoonText {
+    font-size: 2rem;
+    letter-spacing: 0.08em;
+  }
+
+  .techkshetraText {
+    font-size: 2rem;
+  }
+
+  .tagline {
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+  }
+
+  .yearBadge {
+    font-size: 0.55rem;
+    padding: 0.4rem 1rem;
+    letter-spacing: 0.3em;
+  }
+
+  .divider {
+    margin: 1rem 0;
+  }
+
+  .cornerAccent {
+    width: 20px;
+    height: 20px;
+  }
+  .cornerTopLeft { top: 8px; left: 8px; }
+  .cornerTopRight { top: 8px; right: 8px; }
+  .cornerBottomLeft { bottom: 8px; left: 8px; }
+  .cornerBottomRight { bottom: 8px; right: 8px; }
+  .cornerAccent::before { width: 12px; }
+  .cornerAccent::after { height: 12px; }
+
+  .glowOrb {
+    width: 280px;
+    height: 280px;
+  }
+
+  .brandingBar {
+    padding: 0.75rem 1rem 1.25rem;
+    padding-bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  .collegeName {
+    font-size: 0.5rem;
+    letter-spacing: 0.15em;
+  }
+
+  .watermarkLine {
+    font-size: 2.5rem;
+  }
+}
+
+/* Standard phones */
+@media (min-width: 381px) and (max-width: 480px) {
+  .heroContent {
+    padding: 1.25rem 1rem;
+  }
+
+  .comingSoonText {
+    font-size: 2.5rem;
+  }
+
+  .techkshetraText {
+    font-size: 2.5rem;
+  }
+
+  .tagline {
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+  }
+
+  .yearBadge {
+    font-size: 0.6rem;
+    padding: 0.4rem 1.2rem;
+  }
+
+  .divider {
+    margin: 1.2rem 0;
+  }
+
+  .cornerAccent {
+    width: 24px;
+    height: 24px;
+  }
+  .cornerTopLeft { top: 12px; left: 12px; }
+  .cornerTopRight { top: 12px; right: 12px; }
+  .cornerBottomLeft { bottom: 12px; left: 12px; }
+  .cornerBottomRight { bottom: 12px; right: 12px; }
+  .cornerAccent::before { width: 14px; }
+  .cornerAccent::after { height: 14px; }
+
+  .glowOrb {
+    width: 320px;
+    height: 320px;
+  }
+
+  .brandingBar {
+    padding: 1rem 1rem 1.5rem;
+    padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  .collegeName {
+    font-size: 0.55rem;
+  }
+
+  .watermarkLine {
+    font-size: 3rem;
+  }
+}
+
+/* Tablets */
+@media (min-width: 481px) and (max-width: 768px) {
+  .glowOrb {
+    width: 450px;
+    height: 450px;
+  }
+
+  .comingSoonText {
+    font-size: 4rem;
+  }
+
+  .techkshetraText {
+    font-size: 4rem;
+  }
+}
