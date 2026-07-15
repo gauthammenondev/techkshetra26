@@ -3,94 +3,77 @@
  *
  * Behavior:
  * - Full-viewport immersive "coming soon" reveal for Techkshetra'26.
- * - Renders WITHOUT Navigation or MoonBackground (standalone for QR scans).
- * - Uses ornate serif font (Cinzel Decorative) for "Techkshetra".
- * - Torch/flashlight cursor: dark overlay with radial-gradient hole following mouse.
+ * - Page starts dark. A pull cord hangs from the top-right area.
+ * - Clicking the cord triggers a pull animation and switches ON a spotlight
+ *   that illuminates the center content (Techkshetra FallingText).
+ * - Clicking "Techkshetra" triggers the FallingText fall → reveals "Coming Soon".
  * - CSS-only animations: staggered entrance, floating particles, glow pulse, scan line.
  */
 
 import type React from 'react'
-import { useEffect, useRef, useCallback } from 'react'
+import { useCallback, useState } from 'react'
 import styles from './ComingSoonPage.module.css'
+import FallingText from '../../components/FallingText/FallingText'
 
 export function ComingSoonPage(): React.JSX.Element {
-  const wrapperRef = useRef<HTMLDivElement | null>(null)
+  const [lightOn, setLightOn] = useState(false)
+  const [cordPulled, setCordPulled] = useState(false)
+  const [hasRevealed, setHasRevealed] = useState(false)
 
-  /**
-   * Behavior: Track mouse position and write CSS custom properties directly to the
-   * wrapper element. The torch overlay, glow, and cursor dot all read these properties
-   * to position themselves. Uses requestAnimationFrame for smooth 60fps updates.
-   */
-  const handleMouseMove = useCallback((e: MouseEvent) => {
-    const wrapper = wrapperRef.current
-    if (!wrapper) return
+  const handleCordPull = useCallback(() => {
+    if (cordPulled) return
+    setCordPulled(true)
 
-    const x = e.clientX
-    const y = e.clientY
-    const vw = window.innerWidth
-    const vh = window.innerHeight
+    // Cord snaps back after pull animation, then spotlight turns on
+    setTimeout(() => {
+      setLightOn(true)
+    }, 400)
+  }, [cordPulled])
 
-    // Percentage-based for the radial-gradient `at` position
-    const pctX = ((x / vw) * 100).toFixed(2)
-    const pctY = ((y / vh) * 100).toFixed(2)
-
-    wrapper.style.setProperty('--mx', `${pctX}%`)
-    wrapper.style.setProperty('--my', `${pctY}%`)
-    // Pixel-based for the glow and cursor dot
-    wrapper.style.setProperty('--mx-px', `${x}px`)
-    wrapper.style.setProperty('--my-px', `${y}px`)
+  const handleFall = useCallback(() => {
+    setHasRevealed(true)
   }, [])
-
-  /**
-   * Behavior: Track touch position for mobile torch effect.
-   * Reads the first touch point and updates the same CSS custom properties
-   * so the torch overlay follows the user's finger.
-   */
-  const handleTouch = useCallback((e: TouchEvent) => {
-    const wrapper = wrapperRef.current
-    if (!wrapper) return
-
-    const touch = e.touches[0]
-    if (!touch) return
-
-    const x = touch.clientX
-    const y = touch.clientY
-    const vw = window.innerWidth
-    const vh = window.innerHeight
-
-    const pctX = ((x / vw) * 100).toFixed(2)
-    const pctY = ((y / vh) * 100).toFixed(2)
-
-    wrapper.style.setProperty('--mx', `${pctX}%`)
-    wrapper.style.setProperty('--my', `${pctY}%`)
-    wrapper.style.setProperty('--mx-px', `${x}px`)
-    wrapper.style.setProperty('--my-px', `${y}px`)
-  }, [])
-
-  useEffect(() => {
-    window.addEventListener('mousemove', handleMouseMove)
-    window.addEventListener('touchstart', handleTouch, { passive: true })
-    window.addEventListener('touchmove', handleTouch, { passive: true })
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove)
-      window.removeEventListener('touchstart', handleTouch)
-      window.removeEventListener('touchmove', handleTouch)
-    }
-  }, [handleMouseMove, handleTouch])
 
   return (
-    <div ref={wrapperRef} className={styles.pageWrapper}>
-      {/* Torch flashlight overlay — dark with a radial "hole" at cursor */}
-      <div className={styles.torchOverlay} aria-hidden="true" />
+    <div className={`${styles.pageWrapper} ${lightOn ? styles.lightOn : ''}`}>
+      {/* Darkness overlay — covers everything when light is OFF */}
+      <div
+        className={`${styles.darknessOverlay} ${lightOn ? styles.darknessOff : ''}`}
+        aria-hidden="true"
+      />
 
-      {/* Warm ambient glow following cursor */}
-      <div className={styles.torchGlow} aria-hidden="true" />
+      {/* Spotlight cone — visible only when light is ON */}
+      <div
+        className={`${styles.spotlightCone} ${lightOn ? styles.spotlightOn : ''}`}
+        aria-hidden="true"
+      />
 
-      {/* Glowing cursor dot */}
-      <div className={styles.cursorDot} aria-hidden="true" />
+      {/* Spotlight glow on content area */}
+      <div
+        className={`${styles.spotlightGlow} ${lightOn ? styles.spotlightGlowOn : ''}`}
+        aria-hidden="true"
+      />
 
-      {/* Noise texture overlay for subtle grain */}
-      <div className={styles.noiseOverlay} aria-hidden="true" />
+      {/* Pull cord assembly */}
+      <div
+        className={`${styles.cordAssembly} ${cordPulled ? styles.cordPulledState : ''}`}
+        onClick={handleCordPull}
+        role="button"
+        tabIndex={0}
+        aria-label="Pull cord to turn on spotlight"
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleCordPull() }}
+      >
+        {/* Ceiling fixture / mount point */}
+        <div className={styles.ceilingFixture} />
+        {/* The cord line */}
+        <div className={styles.cordLine} />
+        {/* Pull handle at the bottom */}
+        <div className={styles.cordHandle}>
+          {!cordPulled && <span className={styles.cordLabel}>pull</span>}
+        </div>
+      </div>
+
+      {/* Noise texture overlay removed for performance */}
 
       {/* Animated scan line sweep */}
       <div className={styles.scanLine} aria-hidden="true" />
@@ -110,7 +93,6 @@ export function ComingSoonPage(): React.JSX.Element {
       {/* Repeating "COMING SOON" watermark — scrolling down */}
       <div className={styles.watermarkLayer} aria-hidden="true">
         <div className={styles.watermarkScroll}>
-          {/* Set A — fills first 100vh */}
           <span className={styles.watermarkLine}>COMING SOON</span>
           <span className={styles.watermarkLine}>COMING SOON</span>
           <span className={styles.watermarkLine}>COMING SOON</span>
@@ -123,7 +105,6 @@ export function ComingSoonPage(): React.JSX.Element {
           <span className={styles.watermarkLine}>COMING SOON</span>
           <span className={styles.watermarkLine}>COMING SOON</span>
           <span className={styles.watermarkLine}>COMING SOON</span>
-          {/* Set B — duplicate for seamless loop */}
           <span className={styles.watermarkLine}>COMING SOON</span>
           <span className={styles.watermarkLine}>COMING SOON</span>
           <span className={styles.watermarkLine}>COMING SOON</span>
@@ -150,10 +131,44 @@ export function ComingSoonPage(): React.JSX.Element {
 
       {/* Hero content */}
       <div className={styles.heroContent}>
-        <h1 className={styles.comingSoonText}>
-          Coming<br />Soon
-        </h1>
-        <p className={styles.techkshetraText}>Techkshetra</p>
+        {/* Stacked reveal container */}
+        <div className={styles.revealContainer}>
+          {/* "Coming Soon" — revealed when FallingText is triggered */}
+          <h1
+            className={`${styles.comingSoonText} ${hasRevealed ? styles.comingSoonRevealed : styles.comingSoonHidden}`}
+          >
+            Coming<br />Soon
+          </h1>
+
+          {/* FallingText overlay */}
+          <div className={styles.fallingTextOverlay}>
+            <FallingText
+              text="Techkshetra"
+              highlightWords={["Techkshetra"]}
+              highlightClass={styles.fallingTextHighlight}
+              trigger="click"
+              backgroundColor="transparent"
+              wireframes={false}
+              gravity={0.56}
+              fontSize="clamp(2.5rem, 12vw, 7.5rem)"
+              mouseConstraintStiffness={0.9}
+              onTrigger={handleFall}
+              externalTrigger={hasRevealed}
+            />
+          </div>
+        </div>
+
+        {/* Click hint — visible only after light is on but before text falls */}
+        {lightOn && !hasRevealed && (
+          <p 
+            className={styles.clickHint} 
+            onClick={handleFall}
+            style={{ cursor: 'pointer', zIndex: 30, position: 'relative' }}
+          >
+            click to reveal
+          </p>
+        )}
+
         <div className={styles.divider} />
         <p className={styles.tagline}>Where Technology Meets Innovation</p>
         <span className={styles.yearBadge}>2026</span>
@@ -170,4 +185,3 @@ export function ComingSoonPage(): React.JSX.Element {
 }
 
 export default ComingSoonPage
-

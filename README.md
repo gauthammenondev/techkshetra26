@@ -1,6 +1,6 @@
 # Techkshetra'26 — Coming Soon Landing Page
 
-A dark, immersive "Coming Soon" reveal page for **Techkshetra'26**, built with React + Vite. Features a torch/flashlight cursor effect, Gothic Blackletter typography, floating particles, and dramatic CSS-only animations.
+A dark, immersive "Coming Soon" reveal page for **Techkshetra'26**, built with React + Vite. Features an interactive pull-cord spotlight, 2D physics-based falling text (powered by Matter.js), and dramatic reveal animations.
 
 ---
 
@@ -24,7 +24,8 @@ Make sure you have the following installed on your system:
 - **Vite** 8 — Dev server and bundler
 - **TypeScript** 6 — Type safety
 - **CSS Modules** — Scoped component styling
-- **Google Fonts** — UnifrakturCook (logo), Inter (body), Noto Serif (fallback)
+- **Matter.js** — 2D physics engine for the interactive falling text
+- **Google Fonts** — Inter (body), Noto Serif (fallback)
 
 ---
 
@@ -90,6 +91,9 @@ techkshetra26/
     ├── main.tsx                        # React root mount
     ├── App.tsx                         # Router setup
     ├── index.css                       # Global reset styles
+    ├── components/
+    │   └── FallingText/
+    │       └── FallingText.tsx         # Matter.js physics text component
     └── pages/
         └── coming-soon/
             ├── ComingSoonPage.tsx       # Main page component
@@ -103,7 +107,6 @@ techkshetra26/
 This project loads the following resources at runtime (no install required):
 
 - **Google Fonts CDN**
-  - [UnifrakturCook](https://fonts.google.com/specimen/UnifrakturCook) — Gothic Blackletter for the "Techkshetra" logo
   - [Inter](https://fonts.google.com/specimen/Inter) — Clean sans-serif for body text
   - [Noto Serif](https://fonts.google.com/specimen/Noto+Serif) — Serif fallback
 

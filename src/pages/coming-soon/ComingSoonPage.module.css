@@ -3,7 +3,7 @@
  * TECHKSHETRA "COMING SOON" — QR LANDING PAGE
  * =============================================
  * Standalone full-screen page for QR code scans.
- * Dark, immersive, with Gothic Blackletter font
+ * Dark, immersive, with pull cord spotlight reveal
  * and dramatic red "COMING SOON" typography.
  */
 
@@ -19,82 +19,207 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  cursor: none;
 }
 
-/* --- Torch / Flashlight Overlay --- */
-.torchOverlay {
+/* ===================================
+   DARKNESS OVERLAY — Full-screen dark
+   =================================== */
+.darknessOverlay {
   position: fixed;
   inset: 0;
-  z-index: 50;
+  z-index: 40;
   pointer-events: none;
-  background: radial-gradient(
-    circle var(--torch-size, 220px) at var(--mx, 50%) var(--my, 50%),
-    transparent 0%,
-    rgba(0, 0, 0, 0.10) 35%,
-    rgba(0, 0, 0, 0.50) 65%,
-    rgba(0, 0, 0, 0.85) 100%
-  );
-  transition: opacity 0.4s ease;
+  background: rgba(0, 0, 0, 0.92);
+  transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* White torch glow that follows cursor (sits behind the dark overlay) */
-.torchGlow {
+.darknessOff {
+  opacity: 0;
+}
+
+/* ===============================
+   SPOTLIGHT — Cone from top-center
+   =============================== */
+
+/* The diverging spotlight cone from above */
+.spotlightCone {
   position: fixed;
-  z-index: 49;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  z-index: 1;
   pointer-events: none;
-  width: 440px;
-  height: 440px;
+  opacity: 0;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.08) 0%, transparent 85%);
+  clip-path: polygon(40% 0, 60% 0, 100% 100%, 0% 100%);
+  filter: blur(15px);
+  transition: opacity 1.5s ease 0.3s;
+}
+
+.spotlightOn {
+  opacity: 1;
+}
+
+/* Circular spotlight glow on the content area */
+.spotlightGlow {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 700px;
+  height: 700px;
+  transform: translate(-50%, -50%);
   border-radius: 50%;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
   background: radial-gradient(
     circle,
-    rgba(255, 255, 255, 0.18) 0%,
-    rgba(255, 255, 255, 0.08) 35%,
-    rgba(255, 255, 255, 0.02) 60%,
-    transparent 75%
+    rgba(255, 255, 255, 0.12) 0%,
+    rgba(255, 255, 255, 0.06) 30%,
+    rgba(255, 255, 255, 0.02) 55%,
+    transparent 70%
   );
-  transform: translate(-50%, -50%);
-  left: var(--mx-px, 50%);
-  top: var(--my-px, 50%);
+  transition: opacity 1.2s ease 0.5s;
 }
 
-/* Custom cursor dot */
-.cursorDot {
+.spotlightGlowOn {
+  opacity: 1;
+}
+
+/* ========================
+   PULL CORD ASSEMBLY
+   ======================== */
+.cordAssembly {
   position: fixed;
-  z-index: 51;
-  pointer-events: none;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.9);
+  top: 0;
+  left: 50%;
+  translate: -50% 0;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  /* Slight swing animation to attract attention */
+  animation: cordSwing 3s ease-in-out infinite;
+  transform-origin: top center;
+}
+
+.cordAssembly:hover .cordHandle {
   box-shadow:
-    0 0 12px 4px rgba(255, 255, 255, 0.4),
-    0 0 30px 8px rgba(255, 255, 255, 0.15);
-  transform: translate(-50%, -50%);
-  left: var(--mx-px, -100px);
-  top: var(--my-px, -100px);
+    0 0 20px rgba(255, 255, 255, 0.4),
+    0 0 40px rgba(255, 255, 255, 0.15);
+  transform: scale(1.1);
 }
 
-/* Adapt torch for touch-only devices */
-@media (hover: none) and (pointer: coarse) {
-  .pageWrapper {
-    cursor: auto;
-  }
-  /* Hide the cursor dot (no mouse pointer on mobile) */
-  .cursorDot {
-    display: none;
-  }
-  /* Larger torch radius for finger touch */
-  .torchOverlay {
-    --torch-size: 180px;
-  }
-  .torchGlow {
-    width: 360px;
-    height: 360px;
-  }
+/* Ceiling mount / fixture */
+.ceilingFixture {
+  width: 12px;
+  height: 12px;
+  background: radial-gradient(circle, #444 0%, #222 100%);
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
 }
 
-/* --- Floating Particles (CSS-only) --- */
+/* The cord line itself */
+.cordLine {
+  width: 2px;
+  height: clamp(100px, 18vh, 200px);
+  background: linear-gradient(
+    180deg,
+    rgba(200, 200, 200, 0.6) 0%,
+    rgba(200, 200, 200, 0.4) 60%,
+    rgba(200, 200, 200, 0.3) 100%
+  );
+  flex-shrink: 0;
+  transition: height 0.15s ease;
+}
+
+/* Pull handle — small bead/knob at the bottom */
+.cordHandle {
+  width: 16px;
+  height: 24px;
+  background: linear-gradient(180deg, #888 0%, #555 100%);
+  border-radius: 4px 4px 8px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow:
+    0 0 10px rgba(255, 255, 255, 0.15),
+    0 2px 6px rgba(0, 0, 0, 0.5);
+  flex-shrink: 0;
+  position: relative;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* "pull" label below the handle */
+.cordLabel {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.6rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  color: rgba(255, 255, 255, 0.35);
+  white-space: nowrap;
+  animation: labelPulse 2s ease-in-out infinite;
+}
+
+@keyframes labelPulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.7; }
+}
+
+/* Gentle swing to draw attention */
+@keyframes cordSwing {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(1.5deg); }
+  75% { transform: rotate(-1.5deg); }
+}
+
+/* --- Pulled state --- */
+.cordPulledState {
+  /* Stop the gentle swing, let the handle wobble handle the physics */
+  animation: none;
+  transform: rotate(0deg);
+}
+
+.cordPulledState .cordLine {
+  /* The line stretches down, snaps back up too far, and bounces to a stop */
+  animation: cordStretch 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+.cordPulledState .cordHandle {
+  /* The handle wobbles/swings slightly as it snaps back */
+  animation: handleWobble 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  box-shadow:
+    0 0 6px rgba(255, 255, 255, 0.08),
+    0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+@keyframes cordStretch {
+  0% { height: clamp(100px, 18vh, 200px); }
+  20% { height: clamp(160px, 30vh, 320px); } /* Pulled down */
+  40% { height: clamp(80px, 14vh, 160px); }  /* Snap back too far */
+  60% { height: clamp(120px, 20vh, 220px); } /* Bounce down */
+  80% { height: clamp(90px, 16vh, 180px); }  /* Bounce up */
+  100% { height: clamp(100px, 18vh, 200px); } /* Settle */
+}
+
+@keyframes handleWobble {
+  0% { transform: rotate(0deg); }
+  20% { transform: rotate(0deg); } /* At bottom */
+  40% { transform: rotate(18deg); } /* Snap back */
+  60% { transform: rotate(-12deg); }
+  80% { transform: rotate(6deg); }
+  100% { transform: rotate(0deg); }
+}
+
+/* ===========================
+   FLOATING PARTICLES (CSS-only)
+   =========================== */
 .particlesLayer {
   position: absolute;
   inset: 0;
@@ -192,12 +317,6 @@
   animation: watermarkFadeIn 2s ease 1.5s forwards;
 }
 
-/*
- * Inner wrapper holds TWO full-screen sets of text stacked vertically.
- * Total height = 200vh. The animation slides from -50% (showing set 1)
- * to 0% (showing set 2), then instantly resets — creating an infinite
- * seamless downward scroll.
- */
 .watermarkScroll {
   display: flex;
   flex-direction: column;
@@ -225,12 +344,8 @@
 }
 
 @keyframes watermarkScrollDown {
-  0% {
-    transform: translateY(-50%);
-  }
-  100% {
-    transform: translateY(0%);
-  }
+  0% { transform: translateY(-50%); }
+  100% { transform: translateY(0%); }
 }
 
 /* --- Radial Glow Behind Content --- */
@@ -268,6 +383,8 @@
 
 /* "COMING SOON" — massive red text */
 .comingSoonText {
+  position: relative;
+  z-index: 20;
   font-family: 'Inter', 'Noto Serif', sans-serif;
   font-size: clamp(2.5rem, 12vw, 7rem);
   font-weight: 900;
@@ -278,25 +395,65 @@
   text-shadow:
     0 0 60px rgba(204, 0, 0, 0.3),
     0 0 120px rgba(204, 0, 0, 0.15);
-  opacity: 0;
-  transform: translateY(30px) scale(0.95);
-  animation: heroReveal 1s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards;
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* "Techkshetra" — Ornate serif, readable */
-.techkshetraText {
+.comingSoonHidden {
+  opacity: 0;
+  transform: translateY(-100px) scale(1.05);
+  pointer-events: none;
+}
+
+.comingSoonRevealed {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  /* Removed heavy text-shadow animation for performance */
+}
+
+/* Stacked reveal container */
+.revealContainer {
+  position: relative;
+  width: clamp(300px, 80vw, 800px);
+  min-height: clamp(100px, 20vw, 220px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fallingTextOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  cursor: pointer;
+}
+
+/* Highlight class for FallingText words */
+.fallingTextHighlight {
   font-family: 'UnifrakturCook', 'Noto Serif', serif;
-  font-size: clamp(2.5rem, 12vw, 7.5rem);
   font-weight: 700;
   color: #cc0000;
-  line-height: 1.1;
-  margin-top: -0.05em;
   text-shadow:
     0 0 40px rgba(204, 0, 0, 0.25),
     0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Click hint */
+.clickHint {
+  font-family: 'Inter', 'Noto Serif', sans-serif;
+  font-size: clamp(0.55rem, 1.5vw, 0.75rem);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.4em;
+  color: rgba(255, 255, 255, 0.25);
+  margin-top: 0.5rem;
   opacity: 0;
-  transform: translateY(40px);
-  animation: heroReveal 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.6s forwards;
+  animation: clickHintPulse 2s ease-in-out 0.5s infinite;
+}
+
+@keyframes clickHintPulse {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 0.5; }
 }
 
 /* Divider line */
@@ -372,7 +529,7 @@
   text-align: center;
 }
 
-/* --- Scan line effect (subtle horizontal sweep) --- */
+/* --- Scan line effect --- */
 .scanLine {
   position: absolute;
   top: 0;
@@ -417,72 +574,27 @@
   background: rgba(204, 0, 0, 0.25);
 }
 
-.cornerTopLeft {
-  top: 24px;
-  left: 24px;
-}
-.cornerTopLeft::before {
-  top: 0; left: 0;
-  width: 20px; height: 1px;
-}
-.cornerTopLeft::after {
-  top: 0; left: 0;
-  width: 1px; height: 20px;
-}
+.cornerTopLeft { top: 24px; left: 24px; }
+.cornerTopLeft::before { top: 0; left: 0; width: 20px; height: 1px; }
+.cornerTopLeft::after { top: 0; left: 0; width: 1px; height: 20px; }
 
-.cornerTopRight {
-  top: 24px;
-  right: 24px;
-}
-.cornerTopRight::before {
-  top: 0; right: 0;
-  width: 20px; height: 1px;
-}
-.cornerTopRight::after {
-  top: 0; right: 0;
-  width: 1px; height: 20px;
-}
+.cornerTopRight { top: 24px; right: 24px; }
+.cornerTopRight::before { top: 0; right: 0; width: 20px; height: 1px; }
+.cornerTopRight::after { top: 0; right: 0; width: 1px; height: 20px; }
 
-.cornerBottomLeft {
-  bottom: 24px;
-  left: 24px;
-}
-.cornerBottomLeft::before {
-  bottom: 0; left: 0;
-  width: 20px; height: 1px;
-}
-.cornerBottomLeft::after {
-  bottom: 0; left: 0;
-  width: 1px; height: 20px;
-}
+.cornerBottomLeft { bottom: 24px; left: 24px; }
+.cornerBottomLeft::before { bottom: 0; left: 0; width: 20px; height: 1px; }
+.cornerBottomLeft::after { bottom: 0; left: 0; width: 1px; height: 20px; }
 
-.cornerBottomRight {
-  bottom: 24px;
-  right: 24px;
-}
-.cornerBottomRight::before {
-  bottom: 0; right: 0;
-  width: 20px; height: 1px;
-}
-.cornerBottomRight::after {
-  bottom: 0; right: 0;
-  width: 1px; height: 20px;
-}
+.cornerBottomRight { bottom: 24px; right: 24px; }
+.cornerBottomRight::before { bottom: 0; right: 0; width: 20px; height: 1px; }
+.cornerBottomRight::after { bottom: 0; right: 0; width: 1px; height: 20px; }
 
-/* --- Noise Texture Overlay --- */
-.noiseOverlay {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  opacity: 0.03;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-  background-size: 256px 256px;
-}
+/* --- Noise Texture Overlay Removed for Performance --- */
 
 /* --- Responsive: Phones & Tablets --- */
 
-/* Small phones (iPhone SE, Galaxy S8, etc.) */
+/* Small phones */
 @media (max-width: 380px) {
   .heroContent {
     padding: 1rem 0.75rem;
@@ -491,10 +603,6 @@
   .comingSoonText {
     font-size: 2.8rem;
     letter-spacing: 0.08em;
-  }
-
-  .techkshetraText {
-    font-size: 2.8rem;
   }
 
   .tagline {
@@ -512,10 +620,7 @@
     margin: 1rem 0;
   }
 
-  .cornerAccent {
-    width: 20px;
-    height: 20px;
-  }
+  .cornerAccent { width: 20px; height: 20px; }
   .cornerTopLeft { top: 8px; left: 8px; }
   .cornerTopRight { top: 8px; right: 8px; }
   .cornerBottomLeft { bottom: 8px; left: 8px; }
@@ -523,10 +628,7 @@
   .cornerAccent::before { width: 12px; }
   .cornerAccent::after { height: 12px; }
 
-  .glowOrb {
-    width: 280px;
-    height: 280px;
-  }
+  .glowOrb { width: 280px; height: 280px; }
 
   .brandingBar {
     padding: 0.75rem 1rem 1.25rem;
@@ -538,9 +640,10 @@
     letter-spacing: 0.15em;
   }
 
-  .watermarkLine {
-    font-size: 2.5rem;
-  }
+  .watermarkLine { font-size: 2.5rem; }
+
+  .cordLine { height: 80px; }
+  .spotlightGlow { width: 400px; height: 400px; }
 }
 
 /* Standard phones */
@@ -549,13 +652,7 @@
     padding: 1.25rem 1rem;
   }
 
-  .comingSoonText {
-    font-size: 3.2rem;
-  }
-
-  .techkshetraText {
-    font-size: 3.2rem;
-  }
+  .comingSoonText { font-size: 3.2rem; }
 
   .tagline {
     font-size: 0.65rem;
@@ -567,14 +664,9 @@
     padding: 0.4rem 1.2rem;
   }
 
-  .divider {
-    margin: 1.2rem 0;
-  }
+  .divider { margin: 1.2rem 0; }
 
-  .cornerAccent {
-    width: 24px;
-    height: 24px;
-  }
+  .cornerAccent { width: 24px; height: 24px; }
   .cornerTopLeft { top: 12px; left: 12px; }
   .cornerTopRight { top: 12px; right: 12px; }
   .cornerBottomLeft { bottom: 12px; left: 12px; }
@@ -582,37 +674,23 @@
   .cornerAccent::before { width: 14px; }
   .cornerAccent::after { height: 14px; }
 
-  .glowOrb {
-    width: 320px;
-    height: 320px;
-  }
+  .glowOrb { width: 320px; height: 320px; }
 
   .brandingBar {
     padding: 1rem 1rem 1.5rem;
     padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
   }
 
-  .collegeName {
-    font-size: 0.55rem;
-  }
+  .collegeName { font-size: 0.55rem; }
+  .watermarkLine { font-size: 3rem; }
 
-  .watermarkLine {
-    font-size: 3rem;
-  }
+  .cordLine { height: 90px; }
+  .spotlightGlow { width: 450px; height: 450px; }
 }
 
 /* Tablets */
 @media (min-width: 481px) and (max-width: 768px) {
-  .glowOrb {
-    width: 450px;
-    height: 450px;
-  }
-
-  .comingSoonText {
-    font-size: 4rem;
-  }
-
-  .techkshetraText {
-    font-size: 4rem;
-  }
+  .glowOrb { width: 450px; height: 450px; }
+  .comingSoonText { font-size: 4rem; }
+  .spotlightGlow { width: 550px; height: 550px; }
 }
