@@ -17,18 +17,23 @@ import FallingText from '../../components/FallingText/FallingText'
 
 export function ComingSoonPage(): React.JSX.Element {
   const [lightOn, setLightOn] = useState(false)
-  const [cordPulled, setCordPulled] = useState(false)
+  const [isPulling, setIsPulling] = useState(false)
   const [hasRevealed, setHasRevealed] = useState(false)
 
   const handleCordPull = useCallback(() => {
-    if (cordPulled) return
-    setCordPulled(true)
+    if (isPulling) return
+    setIsPulling(true)
 
-    // Cord snaps back after pull animation, then spotlight turns on
+    // Cord snaps back after pull animation, then spotlight toggles
     setTimeout(() => {
-      setLightOn(true)
+      setLightOn((prev) => !prev)
     }, 400)
-  }, [cordPulled])
+
+    // Reset pulling state after animation completes (1.2s)
+    setTimeout(() => {
+      setIsPulling(false)
+    }, 1200)
+  }, [isPulling])
 
   const handleFall = useCallback(() => {
     setHasRevealed(true)
@@ -56,11 +61,11 @@ export function ComingSoonPage(): React.JSX.Element {
 
       {/* Pull cord assembly */}
       <div
-        className={`${styles.cordAssembly} ${cordPulled ? styles.cordPulledState : ''}`}
+        className={`${styles.cordAssembly} ${isPulling ? styles.cordPulledState : ''}`}
         onClick={handleCordPull}
         role="button"
         tabIndex={0}
-        aria-label="Pull cord to turn on spotlight"
+        aria-label="Pull cord to toggle spotlight"
         onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleCordPull() }}
       >
         {/* Ceiling fixture / mount point */}
@@ -69,7 +74,7 @@ export function ComingSoonPage(): React.JSX.Element {
         <div className={styles.cordLine} />
         {/* Pull handle at the bottom */}
         <div className={styles.cordHandle}>
-          {!cordPulled && <span className={styles.cordLabel}>pull</span>}
+          {!lightOn && !isPulling && <span className={styles.cordLabel}>pull</span>}
         </div>
       </div>
 
