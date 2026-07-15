@@ -29,11 +29,11 @@
   z-index: 50;
   pointer-events: none;
   background: radial-gradient(
-    circle var(--torch-size, 180px) at var(--mx, 50%) var(--my, 50%),
+    circle var(--torch-size, 220px) at var(--mx, 50%) var(--my, 50%),
     transparent 0%,
-    rgba(0, 0, 0, 0.25) 40%,
-    rgba(0, 0, 0, 0.65) 70%,
-    rgba(0, 0, 0, 0.88) 100%
+    rgba(0, 0, 0, 0.10) 35%,
+    rgba(0, 0, 0, 0.50) 65%,
+    rgba(0, 0, 0, 0.85) 100%
   );
   transition: opacity 0.4s ease;
 }
@@ -43,19 +43,19 @@
   position: fixed;
   z-index: 49;
   pointer-events: none;
-  width: 360px;
-  height: 360px;
+  width: 440px;
+  height: 440px;
   border-radius: 50%;
   background: radial-gradient(
     circle,
-    rgba(255, 255, 255, 0.1) 0%,
-    rgba(255, 255, 255, 0.04) 40%,
-    transparent 70%
+    rgba(255, 255, 255, 0.18) 0%,
+    rgba(255, 255, 255, 0.08) 35%,
+    rgba(255, 255, 255, 0.02) 60%,
+    transparent 75%
   );
   transform: translate(-50%, -50%);
   left: var(--mx-px, 50%);
   top: var(--my-px, 50%);
-  transition: left 0.08s linear, top 0.08s linear;
 }
 
 /* Custom cursor dot */
@@ -73,18 +73,24 @@
   transform: translate(-50%, -50%);
   left: var(--mx-px, -100px);
   top: var(--my-px, -100px);
-  transition: left 0.06s linear, top 0.06s linear;
 }
 
-/* Hide torch on touch-only devices */
+/* Adapt torch for touch-only devices */
 @media (hover: none) and (pointer: coarse) {
   .pageWrapper {
     cursor: auto;
   }
-  .torchOverlay,
-  .torchGlow,
+  /* Hide the cursor dot (no mouse pointer on mobile) */
   .cursorDot {
     display: none;
+  }
+  /* Larger torch radius for finger touch */
+  .torchOverlay {
+    --torch-size: 180px;
+  }
+  .torchGlow {
+    width: 360px;
+    height: 360px;
   }
 }
 
@@ -279,7 +285,7 @@
 
 /* "Techkshetra" — Ornate serif, readable */
 .techkshetraText {
-  font-family: 'Cinzel Decorative', 'Cinzel', 'Noto Serif', serif;
+  font-family: 'UnifrakturCook', 'Noto Serif', serif;
   font-size: clamp(2.5rem, 12vw, 7.5rem);
   font-weight: 700;
   color: #cc0000;
@@ -483,12 +489,12 @@
   }
 
   .comingSoonText {
-    font-size: 2rem;
+    font-size: 2.8rem;
     letter-spacing: 0.08em;
   }
 
   .techkshetraText {
-    font-size: 2rem;
+    font-size: 2.8rem;
   }
 
   .tagline {
@@ -544,11 +550,11 @@
   }
 
   .comingSoonText {
-    font-size: 2.5rem;
+    font-size: 3.2rem;
   }
 
   .techkshetraText {
-    font-size: 2.5rem;
+    font-size: 3.2rem;
   }
 
   .tagline {

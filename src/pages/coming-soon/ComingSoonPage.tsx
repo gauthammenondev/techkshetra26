@@ -41,12 +41,42 @@ export function ComingSoonPage(): React.JSX.Element {
     wrapper.style.setProperty('--my-px', `${y}px`)
   }, [])
 
+  /**
+   * Behavior: Track touch position for mobile torch effect.
+   * Reads the first touch point and updates the same CSS custom properties
+   * so the torch overlay follows the user's finger.
+   */
+  const handleTouch = useCallback((e: TouchEvent) => {
+    const wrapper = wrapperRef.current
+    if (!wrapper) return
+
+    const touch = e.touches[0]
+    if (!touch) return
+
+    const x = touch.clientX
+    const y = touch.clientY
+    const vw = window.innerWidth
+    const vh = window.innerHeight
+
+    const pctX = ((x / vw) * 100).toFixed(2)
+    const pctY = ((y / vh) * 100).toFixed(2)
+
+    wrapper.style.setProperty('--mx', `${pctX}%`)
+    wrapper.style.setProperty('--my', `${pctY}%`)
+    wrapper.style.setProperty('--mx-px', `${x}px`)
+    wrapper.style.setProperty('--my-px', `${y}px`)
+  }, [])
+
   useEffect(() => {
     window.addEventListener('mousemove', handleMouseMove)
+    window.addEventListener('touchstart', handleTouch, { passive: true })
+    window.addEventListener('touchmove', handleTouch, { passive: true })
     return () => {
       window.removeEventListener('mousemove', handleMouseMove)
+      window.removeEventListener('touchstart', handleTouch)
+      window.removeEventListener('touchmove', handleTouch)
     }
-  }, [handleMouseMove])
+  }, [handleMouseMove, handleTouch])
 
   return (
     <div ref={wrapperRef} className={styles.pageWrapper}>

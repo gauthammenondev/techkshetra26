@@ -1,34 +1,116 @@
-# React + TypeScript + Vite
+# Techkshetra'26 — Coming Soon Landing Page
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+A dark, immersive "Coming Soon" reveal page for **Techkshetra'26**, built with React + Vite. Features a torch/flashlight cursor effect, Gothic Blackletter typography, floating particles, and dramatic CSS-only animations.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Prerequisites
 
-## React Compiler
+Make sure you have the following installed on your system:
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+| Tool    | Version  | Download                                      |
+| ------- | -------- | --------------------------------------------- |
+| Node.js | ≥ 18.x   | [nodejs.org](https://nodejs.org/)             |
+| npm     | ≥ 9.x    | Bundled with Node.js                          |
 
-Note: This will impact Vite dev & build performances.
+> **Tip:** Run `node -v` and `npm -v` to check your installed versions.
 
-## Expanding the Oxlint configuration
+---
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+## Tech Stack
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+- **React** 19 — UI library
+- **React Router** 7 — Client-side routing
+- **Vite** 8 — Dev server and bundler
+- **TypeScript** 6 — Type safety
+- **CSS Modules** — Scoped component styling
+- **Google Fonts** — UnifrakturCook (logo), Inter (body), Noto Serif (fallback)
+
+---
+
+## Getting Started
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/your-org/techkshetra26.git
+cd techkshetra26
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+### 2. Install dependencies
+
+```bash
+npm install
+```
+
+### 3. Start the development server
+
+```bash
+npm run dev
+```
+
+The app will be available at **http://localhost:5173/** by default.
+
+### 4. Build for production
+
+```bash
+npm run build
+```
+
+Output will be generated in the `dist/` directory.
+
+### 5. Preview the production build
+
+```bash
+npm run preview
+```
+
+---
+
+## Available Scripts
+
+| Script            | Command              | Description                            |
+| ----------------- | -------------------- | -------------------------------------- |
+| `npm run dev`     | `vite`               | Start the Vite dev server with HMR     |
+| `npm run build`   | `tsc -b && vite build` | Type-check and create production build |
+| `npm run lint`    | `oxlint`             | Run the OxLint linter                  |
+| `npm run preview` | `vite preview`       | Preview the production build locally   |
+
+---
+
+## Project Structure
+
+```
+techkshetra26/
+├── index.html                          # HTML entry point (Google Fonts loaded here)
+├── package.json
+├── tsconfig.json
+├── vite.config.ts
+└── src/
+    ├── main.tsx                        # React root mount
+    ├── App.tsx                         # Router setup
+    ├── index.css                       # Global reset styles
+    └── pages/
+        └── coming-soon/
+            ├── ComingSoonPage.tsx       # Main page component
+            └── ComingSoonPage.module.css # All page styles & animations
+```
+
+---
+
+## External Resources
+
+This project loads the following resources at runtime (no install required):
+
+- **Google Fonts CDN**
+  - [UnifrakturCook](https://fonts.google.com/specimen/UnifrakturCook) — Gothic Blackletter for the "Techkshetra" logo
+  - [Inter](https://fonts.google.com/specimen/Inter) — Clean sans-serif for body text
+  - [Noto Serif](https://fonts.google.com/specimen/Noto+Serif) — Serif fallback
+
+No other external APIs, images, or CDN assets are required.
+
+---
+
+## License
+
+Private project — not for redistribution.
