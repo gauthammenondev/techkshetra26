@@ -184,6 +184,10 @@ export function ComingSoonPage(): React.JSX.Element {
         <p className={styles.collegeName}>
           Rajagiri School of Engineering &amp; Technology
         </p>
+        <div className={styles.websiteCredits}>
+          <p>With Love and Tokens</p>
+          <p>by the website team</p>
+        </div>
       </div>
     </div>
   )
