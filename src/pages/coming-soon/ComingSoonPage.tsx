@@ -151,8 +151,8 @@ export function ComingSoonPage(): React.JSX.Element {
             style={{ pointerEvents: lightOn ? 'auto' : 'none' }}
           >
             <FallingText
-              text="Techkshetra"
-              highlightWords={["Techkshetra"]}
+              text="Techkshetra'26"
+              highlightWords={["Techkshetra'26"]}
               highlightClass={styles.fallingTextHighlight}
               trigger="click"
               backgroundColor="transparent"
