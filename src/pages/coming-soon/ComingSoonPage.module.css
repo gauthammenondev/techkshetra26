@@ -8,6 +8,13 @@
  */
 
 /* --- Base Layer --- */
+@font-face {
+  font-family: 'Old London';
+  src: url('../../assets/fonts/old_london/OldLondon.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 .pageWrapper {
   position: relative;
   width: 100%;
@@ -430,8 +437,8 @@
 
 /* Highlight class for FallingText words */
 .fallingTextHighlight {
-  font-family: 'UnifrakturCook', 'Noto Serif', serif;
-  font-weight: 700;
+  font-family: 'Old London', 'UnifrakturCook', 'Noto Serif', serif;
+  font-weight: normal;
   color: #cc0000;
   text-shadow:
     0 0 40px rgba(204, 0, 0, 0.25),

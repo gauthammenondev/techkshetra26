@@ -74,7 +74,7 @@ export function ComingSoonPage(): React.JSX.Element {
         <div className={styles.cordLine} />
         {/* Pull handle at the bottom */}
         <div className={styles.cordHandle}>
-          {!lightOn && !isPulling && <span className={styles.cordLabel}>pull</span>}
+          {!lightOn && !isPulling && <span className={styles.cordLabel}>click</span>}
         </div>
       </div>
 
@@ -146,7 +146,10 @@ export function ComingSoonPage(): React.JSX.Element {
           </h1>
 
           {/* FallingText overlay */}
-          <div className={styles.fallingTextOverlay}>
+          <div 
+            className={styles.fallingTextOverlay}
+            style={{ pointerEvents: lightOn ? 'auto' : 'none' }}
+          >
             <FallingText
               text="Techkshetra"
               highlightWords={["Techkshetra"]}
